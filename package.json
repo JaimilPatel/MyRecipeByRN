@@ -1,5 +1,5 @@
 {
-  "name": "MyRecipeByRn",
+  "name": "myrecipebyrn",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,8 +10,12 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "expo-linear-gradient": "^8.0.0",
     "react": "16.9.0",
     "react-native": "0.61.5",
+    "react-native-hide-show-password-input": "^1.1.0",
+    "react-native-linear-gradient": "^2.5.6",
+    "react-native-material-buttons": "^0.6.0",
     "react-native-material-textfield": "^0.16.1"
   },
   "devDependencies": {
