@@ -4,27 +4,8 @@ import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
 import {  RaisedTextButton } from 'react-native-material-buttons';
+import AsyncStorage from '@react-native-community/async-storage';
 	
-
-const w = Dimensions.get('window');
-
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-  
-];
-
-
 const styles = StyleSheet.create({
 
   inputs: {
@@ -110,15 +91,6 @@ alignItems : "center"
   },
 })
 
-function Item({ title }) {
-  return (
-    <View style={styles.item}>
-      <Text style={styles.title}>{title}</Text>
-    </View>
-  );
-}
-
-
 export class SignInComponent extends Component {
 
   fieldRef = React.createRef();
@@ -127,17 +99,7 @@ export class SignInComponent extends Component {
     super()
     this.state = { email: 'jm1@example.com', password: 'jay@123' }
   }
-
-  onSubmit = () => {
-    let { current: field } = this.fieldRef;
-
-    console.log(field.value());
-  };
-
-  formatText = (text) => {
-    return text.replace(/[^+\d]/g, '');
-  };
-
+  
   onSignIn(email, password) {
     if (email == '' || password == '') {
       if (email == '' && password == '') {
@@ -161,12 +123,23 @@ export class SignInComponent extends Component {
           })
         }).then((response) => {
           if (response.status == 200) {
-            Alert.alert("Login Success", "Successfully LoggedIn")
+            
             return response.json()
           } else {
             Alert.alert("Login Failure", "Failure")
           }
         }).then((responseJson) => {
+          
+          const {token} = responseJson
+          
+          alert(token)
+          console.log(token)
+          // storeData = async () => {
+          //   try {
+          //     await AsyncStorage.setItem('storeToken', token)
+          //   } catch (e) {
+          //   }
+          // }
           return responseJson
         }).catch((error) => {
           console.log(error)
@@ -207,9 +180,6 @@ export class SignInComponent extends Component {
           />
         </View>
           <View style= {styles.centerContainer}>
-          {/* <TouchableHighlight >
-            <Text style={styles.loginText}>LOG IN</Text>
-          </TouchableHighlight> */}
           <RaisedTextButton title='LOG IN' textColor  = 'white' style={[styles.loginButtonContainer, styles.loginButton]} onPress={() => this.onSignIn(this.state.email, this.state.password)}/>
           <Text style={styles.normalText}>Forgot Your Password</Text>
           </View>
@@ -217,13 +187,6 @@ export class SignInComponent extends Component {
         
         
       </ScrollView>
-      // <SafeAreaView>
-      //     <FlatList
-      //   data={DATA}
-      //   renderItem={({ item }) => <Item title={item.title} />}
-      //   keyExtractor={item => item.id}
-      // />
-      // </SafeAreaView>
     )
   }
 }
