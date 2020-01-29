@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
 import { ImageBackground, View, Button } from 'react-native'
 export class SplashComponent extends Component {
-
+    static navigationOptions = {
+        headerShown: false
+      };
+    
     componentDidMount() {
         setTimeout(() => {
            this.load();

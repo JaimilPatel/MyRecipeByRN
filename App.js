@@ -5,22 +5,26 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { SplashComponent } from './components/SplashComponent';
 import { HomeComponent } from './components/HomeComponent';
 
-const RootStack = createStackNavigator(
-  {
-    Splash: HomeComponent,
-    SignIn: SignInComponent,
-   
-  },
-  {
-    initialRouteName: 'Splash',
-  }
+// const RootStack = createStackNavigator(
+//   {
+//     Splash: SplashComponent,
+//     SignIn: SignInComponent,
+//     CookingList : HomeComponent
+//   },
+//   {
+//     initialRouteName: 'Splash',
+//   }
   
-);
+// );
 
-const AppContainer = createAppContainer(RootStack);
+const MainNavigator = createStackNavigator({
+  Splash: {screen: SplashComponent},
+  SignIn: {screen: SignInComponent},
+  CookingList: {screen: HomeComponent},
+});
 
-export default class App extends Component {
-  render() {
-    return <AppContainer />;
-  }
-}
+const App = createAppContainer(MainNavigator);
+export default App;
+
+
+

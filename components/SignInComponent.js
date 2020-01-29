@@ -4,7 +4,6 @@ import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
 import {  RaisedTextButton } from 'react-native-material-buttons';
-import AsyncStorage from '@react-native-community/async-storage';
 	
 const styles = StyleSheet.create({
 
@@ -92,7 +91,9 @@ alignItems : "center"
 })
 
 export class SignInComponent extends Component {
-
+  static navigationOptions = {
+    headerShown: false
+  };
   fieldRef = React.createRef();
 
   constructor() {
@@ -132,8 +133,8 @@ export class SignInComponent extends Component {
           
           const {token} = responseJson
           
-          alert(token)
           console.log(token)
+          this.props.navigation.push("CookingList");
           // storeData = async () => {
           //   try {
           //     await AsyncStorage.setItem('storeToken', token)
