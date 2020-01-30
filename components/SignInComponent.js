@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeAreaView, FlatList} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeAreaView, FlatList , AsyncStorage ,TouchableOpacity} from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
   },
   loginButtonContainer: {
     height: 45,
-    marginTop: 20,
+    marginTop: 10,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -27,6 +27,15 @@ const styles = StyleSheet.create({
   loginButton: {
     backgroundColor: "#2464E5",
     color: '#000000'
+  },
+  touchableButton : {
+    alignItems: 'center',
+    backgroundColor: '#2464E5',
+    width : 310,
+    justifyContent : "center",
+    borderRadius: 10,
+    height: 45,
+    marginTop : 10,
   },
   loginText: {
     textAlign: 'center',
@@ -49,7 +58,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   scrollContainer: {
-    backgroundColor: '#F2EFEC',
+    backgroundColor: '#E4E7EE',
   },
   imageContainer: {
     borderRadius: 400,
@@ -74,7 +83,7 @@ const styles = StyleSheet.create({
   },
   outLinedTextField: {
     paddingHorizontal: 50,
-    marginTop : 10
+    marginTop : 20
   },
   centerContainer : {
 alignItems : "center"
@@ -135,19 +144,10 @@ export class SignInComponent extends Component {
           this.setState({
             authToken : token
           });
-          console.log(token)
-          //this.props.navigation.push("CookingList");
           this.props.navigation.navigate('CookingList', {
             data: this.state.authToken
           });
-          console.log("new authToken"+this.state.authToken)
-          // storeData = async () => {
-          //   try {
-          //     await AsyncStorage.setItem('storeToken', token)
-          //   } catch (e) {
-          //   }
-          // }
-          return responseJson
+         return responseJson
         }).catch((error) => {
           console.log(error)
         });
@@ -187,8 +187,11 @@ export class SignInComponent extends Component {
           />
         </View>
           <View style= {styles.centerContainer}>
-          <RaisedTextButton title='LOG IN' textColor  = 'white' style={[styles.loginButtonContainer, styles.loginButton]} onPress={() => this.onSignIn(this.state.email, this.state.password)}/>
-          <Text style={styles.normalText}>Forgot Your Password</Text>
+          {/* <RaisedTextButton title='LOG IN' textColor  = 'white' style={[styles.loginButtonContainer, styles.loginButton]} onPress={() => this.onSignIn(this.state.email, this.state.password)}/> */}
+          <TouchableOpacity style = {styles.touchableButton}onPress={() => this.onSignIn(this.state.email, this.state.password)}>
+      <Text style = {{color : 'white'}}>LOG IN</Text>
+    </TouchableOpacity>
+          {/* <Text style={styles.normalText}>Forgot Your Password</Text> */}
           </View>
         </View>
       </ScrollView>
