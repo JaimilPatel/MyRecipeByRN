@@ -4,6 +4,7 @@ import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 const placeholder = require('../images/loaderfood.gif');
 
+
 const styles = StyleSheet.create({
 
   rowContainer: {
@@ -25,18 +26,16 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     justifyContent: "space-around",
-    backgroundColor: '#A0A5B0',
+    backgroundColor: 'white',
     alignItems: "center",
-    width: 381,
+    width: 378,
     height: 50,
     padding: 5,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20
   },
   imageViewController: {
     alignItems: "center",
-    height: 235,
-    backgroundColor: '#A0A5B0',
+    height: 238,
+    backgroundColor: 'white',
     borderRadius: 10,
     margin: 15,
     padding: 15
@@ -77,7 +76,8 @@ const styles = StyleSheet.create({
 
   transparentContainer: {
     backgroundColor: 'rgba(0,0,0,0.2)',
-    flexDirection: 'row'
+    flexDirection: 'row',
+   
   },
   horizontalImageViewContainer: {
     width: ((Dimensions.get('window').width - 60) / 2),
@@ -86,6 +86,15 @@ const styles = StyleSheet.create({
     color: 'white',
     marginStart: 5,
     marginTop: 3
+  },
+  lastViewContainer:{
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    width: 381.5,
+    height: 5,
+    padding: 5,
+    borderColor  :'black', borderWidth: 1,borderTopWidth :0, borderBottomStartRadius : 10, borderBottomEndRadius : 10
   }
 })
 
@@ -197,23 +206,27 @@ export class HomeComponent extends Component {
       );
     }
     return (
-      <SafeAreaView style={{ backgroundColor: 'white' }}>
-        <ScrollView>
-        <View style={{ backgroundColor: 'white' }}>
+      <SafeAreaView>
+        <View style={{ backgroundColor: '#E4E7EE' }}>
+        <Text style={{ fontWeight: "bold", fontSize: 20, padding: 10, paddingBottom: 5 }}>Meals For One</Text>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-            <Text style={{ fontWeight: "bold", fontSize: 20, padding: 10, paddingBottom: 5 }}>Meals For One</Text>
-            <Text style={{ marginStart: 10, fontSize: 18, padding: 10, paddingBottom: 5}}>See all</Text>
-          </View>
           <Text style={{ marginStart: 10, fontSize: 15 }}>Everyday meals curated for you</Text>
+            <View style={styles.combineRowContainer}>
+               <Text style={{ fontSize: 17, fontWeight: '900'}}>See all</Text>
+                          <Image source={require('../images/next.png')} style={{ width: 20, height: 20,marginStart:3, marginEnd: 10 ,marginTop : 2}}></Image>
+                          
+                        </View>
+          </View>
+         
           <FlatList
           refreshControl={
             <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
           }
             horizontal={true}
-            data={this.state.dataFavouriteSource.slice(0,4)}
+            data={this.state.dataFavouriteSource}
             renderItem={({ item }) => {
               return <View style={styles.horizontalImageViewContainer}>
-                <View style={{ height: 200, backgroundColor: '#A0A5B0', margin: 10, borderRadius: 10 }}>
+                <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10,borderColor  :'black', borderWidth: 1, }}>
                   <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 50 }}>
                     <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={placeholder} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
@@ -237,15 +250,17 @@ export class HomeComponent extends Component {
             keyExtractor={item => item.recipeId}
           />
         </View>
-        <View style = {{backgroundColor: 'white'}}>
-        <FlatList
+        <View style = {{backgroundColor: '#E4E7EE'}}>
+        <Text style={{ fontWeight: "bold", fontSize: 20, padding: 10, paddingBottom: 5 }}>Orders</Text>
+        <Text style={{ marginStart: 10, fontSize: 15 }}>First we eat, then we do everything else.</Text>
+        <FlatList style = {{marginTop : 10}}
           refreshControl={
             <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
           }
           data={this.state.dataFeedSource}
           renderItem={({ item }) => {
             return (
-              <View style={styles.imageViewController}>
+              <View style={[styles.imageViewController, {borderColor  :'black', borderWidth: 1, borderBottomWidth :1 }]}>
                 <View style={styles.topTitleContainer}>
                   <View style={{flexDirection : 'row', marginStart : 10}}>
                   <Image
@@ -263,7 +278,7 @@ export class HomeComponent extends Component {
                   </TouchableWithoutFeedback>
                 </View>
                 <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)}>
-                  <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={placeholder} style={[styles.imageContainer, { height: 180 }]} resizeMode="cover">
+                  <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={placeholder} style={[styles.imageContainer, { height: 178 ,marginBottom : 10}]} resizeMode="cover">
                     <View style={styles.transparentContainer}>
                       <View style={styles.rowContainer}>
                         <View style={styles.combineRowContainer}>
@@ -282,15 +297,13 @@ export class HomeComponent extends Component {
                     </View>
                   </ImageBackground>
                 </TouchableWithoutFeedback>
-                <View style = {{height : 10, width : 381,backgroundColor  :'#A0A5B0',borderBottomStartRadius : 10, borderBottomEndRadius : 10}}>
-                </View>
+                {/* <View style = {styles.lastViewContainer}/> */}
               </View>
             );
           }}
           keyExtractor={item => item.recipeId}
         />
         </View>
-        </ScrollView>
       </SafeAreaView>
     );
   }
