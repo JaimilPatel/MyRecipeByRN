@@ -8,7 +8,7 @@ export class SplashComponent extends Component {
     componentDidMount() {
         setTimeout(() => {
            this.load();
-              }, 4000);
+              }, 2000);
         }
     
        load = () => {

@@ -98,7 +98,7 @@ export class SignInComponent extends Component {
 
   constructor() {
     super()
-    this.state = { email: 'jm1@example.com', password: 'jay@123' }
+    this.state = { email: 'jm1@example.com', password: 'jay@123', authToken : null }
   }
   
   onSignIn(email, password) {
@@ -132,9 +132,15 @@ export class SignInComponent extends Component {
         }).then((responseJson) => {
           
           const {token} = responseJson
-          
+          this.setState({
+            authToken : token
+          });
           console.log(token)
-          this.props.navigation.push("CookingList");
+          //this.props.navigation.push("CookingList");
+          this.props.navigation.navigate('CookingList', {
+            data: this.state.authToken
+          });
+          console.log("new authToken"+this.state.authToken)
           // storeData = async () => {
           //   try {
           //     await AsyncStorage.setItem('storeToken', token)
@@ -185,9 +191,8 @@ export class SignInComponent extends Component {
           <Text style={styles.normalText}>Forgot Your Password</Text>
           </View>
         </View>
-        
-        
       </ScrollView>
     )
+    
   }
 }
