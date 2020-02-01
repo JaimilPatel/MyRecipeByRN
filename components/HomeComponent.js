@@ -3,7 +3,6 @@ import { View, FlatList, SafeAreaView, RefreshControl, ImageBackground, Touchabl
 import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 
-const placeholder = 'https://raw.githubusercontent.com/sanket-vekariya/flutter-my-recipes-jsp-master/master/images/loaderfood.gif';
 
 
 const styles = StyleSheet.create({
@@ -311,7 +310,7 @@ export class HomeComponent extends Component {
                 return <View style={styles.horizontalImageViewContainer}>
                   <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
                     <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 50 }}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={{ uri: placeholder }} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
+                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')}  style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
                       </ImageBackground>
                     </TouchableWithoutFeedback>
@@ -366,7 +365,7 @@ export class HomeComponent extends Component {
                       </TouchableWithoutFeedback>
                     </View>
                     <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={placeholder} style={[styles.imageContainer, { height: 178, marginBottom: 10 }]} resizeMode="cover">
+                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')}  style={[styles.imageContainer, { height: 178, marginBottom: 10 }]} resizeMode="cover">
                         <View style={styles.transparentContainer}>
                           <View style={styles.rowContainer}>
                             <View style={styles.combineRowContainer}>
