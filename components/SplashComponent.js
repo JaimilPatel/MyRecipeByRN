@@ -16,7 +16,9 @@ export class SplashComponent extends Component {
         };
     render() {
         return (
-                <ImageBackground source={require('../images/back.png')} style={{ width: '100%', height: '100%' }}></ImageBackground>
+                <ImageBackground source={{uri : 'https://www.gojekclone.com/images/food-app/user-app/splash-screen.jpg'}} style={{ width: '100%', height: '100%' }}>
+                  
+                </ImageBackground>
         )
     }
 }

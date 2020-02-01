@@ -1,9 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeAreaView, FlatList , AsyncStorage ,TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeAreaView, FlatList , AsyncStorage ,TouchableOpacity, ImageBackground} from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
-import {  RaisedTextButton } from 'react-native-material-buttons';
 	
 const styles = StyleSheet.create({
 
@@ -30,7 +29,7 @@ const styles = StyleSheet.create({
   },
   touchableButton : {
     alignItems: 'center',
-    backgroundColor: '#2464E5',
+    backgroundColor: 'black',
     width : 310,
     justifyContent : "center",
     borderRadius: 10,
@@ -58,7 +57,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   scrollContainer: {
-    backgroundColor: '#E4E7EE',
+    backgroundColor: 'rgba(255,255,255,0.3)',
   },
   imageContainer: {
     borderRadius: 400,
@@ -83,7 +82,7 @@ const styles = StyleSheet.create({
   },
   outLinedTextField: {
     paddingHorizontal: 50,
-    marginTop : 20
+    marginTop : 20,
   },
   centerContainer : {
 alignItems : "center"
@@ -97,6 +96,7 @@ alignItems : "center"
   title: {
     fontSize: 32,
   },
+  
 })
 
 export class SignInComponent extends Component {
@@ -157,11 +157,17 @@ export class SignInComponent extends Component {
 
   render() {
     return (
-      <ScrollView style={styles.scrollContainer}>
+      
+         <ImageBackground source={{
+           uri : 'https://lh5.googleusercontent.com/proxy/g87eEEzrDk1VMpfqhRMNmRD5KrLfuLQwEFwOFJp6zmLxBRiy2MuVHGuOl9ZyUuYOPFj09Ik8swH6g7-EXeplGlWnzKQTJzOGWKxXyJ13vCz7N6dxAqc0A0Wcmo2w0munsDGgpl0dfv-RbHnjfY0qMERQ2g'
+         }}style={{ width: '100%',
+         height: '100%',
+         flex: 1 , }} resizeMode="cover">
+        <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
           <View style= {styles.centerContainer}>
           <Image
-            source={{ uri: `https://www.cookwithmanali.com/wp-content/uploads/2014/11/Hakka-Noodles-1-500x375.jpg` }}
+            source={{ uri: `https://image.freepik.com/free-vector/cooking-with-love-hand-written-lettering-quote_116399-128.jpg` }}
             style={styles.imageContainer}
             resizeMode="cover"
           />
@@ -194,7 +200,9 @@ export class SignInComponent extends Component {
           {/* <Text style={styles.normalText}>Forgot Your Password</Text> */}
           </View>
         </View>
-      </ScrollView>
+        </ScrollView>
+        </ImageBackground>
+      
     )
     
   }
