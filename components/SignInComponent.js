@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeArea
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
+import AsyncStorage from '@react-native-community/async-storage'
 	
 const styles = StyleSheet.create({
 
@@ -145,6 +146,7 @@ export class SignInComponent extends Component {
           this.setState({
             authToken : token
           });
+          this.storeData(responseJson)
           this.props.navigation.navigate('transfer', {
             data: this.state.authToken
           });
@@ -155,6 +157,19 @@ export class SignInComponent extends Component {
     }
 
   }
+
+  storeData = async (responseJSON) => {
+    const {token} = responseJSON
+    console.log('called store data ' + token);
+    try {
+        console.log('called try block ' + token);
+
+        await AsyncStorage.setItem('authTokenStore', token)
+    } catch (e) {
+        console.log('called catch block----e --------' + e);
+    }
+}
+
   
 
   render() {
