@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeAreaView, FlatList , AsyncStorage ,TouchableOpacity, ImageBackground} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView , SafeAreaView, FlatList ,TouchableOpacity, ImageBackground} from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
@@ -100,6 +100,7 @@ alignItems : "center"
 })
 
 export class SignInComponent extends Component {
+  
   static navigationOptions = {
     headerShown: false
   };
@@ -144,7 +145,7 @@ export class SignInComponent extends Component {
           this.setState({
             authToken : token
           });
-          this.props.navigation.navigate('CookingList', {
+          this.props.navigation.navigate('transfer', {
             data: this.state.authToken
           });
          return responseJson
@@ -152,6 +153,7 @@ export class SignInComponent extends Component {
           console.log(error)
         });
     }
+
   }
   
 

@@ -12,7 +12,7 @@ export class SplashComponent extends Component {
         }
     
        load = () => {
-            this.props.navigation.push("SignIn");
+            this.props.navigation.navigate("SignIn");
         };
     render() {
         return (

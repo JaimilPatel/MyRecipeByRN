@@ -3,7 +3,7 @@ import { View, FlatList, SafeAreaView, RefreshControl, ImageBackground, Touchabl
 import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 
-
+const placholder = require('../images/loaderfood.gif')
 
 const styles = StyleSheet.create({
 
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   }
 })
 
-export class HomeComponent extends Component {
+export class RecipeFeedComponent extends Component {
   static navigationOptions = {
     headerShown: false
   };
@@ -157,6 +157,7 @@ export class HomeComponent extends Component {
 
   onRecipeClick(item) {
     console.log(item)
+    this.props.navigation.navigate("AddRecipe")
   }
 
   addToFavourite(item) {
@@ -310,7 +311,7 @@ export class HomeComponent extends Component {
                 return <View style={styles.horizontalImageViewContainer}>
                   <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
                     <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 50 }}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')}  style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
+                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource = {placholder} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
                       </ImageBackground>
                     </TouchableWithoutFeedback>
