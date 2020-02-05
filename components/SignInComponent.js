@@ -109,7 +109,7 @@ export class SignInComponent extends Component {
 
   constructor() {
     super()
-    this.state = { email: 'jm1@example.com', password: 'jay@123', authToken : null }
+    this.state = { email: '', password: '', authToken : null }
   }
   
   onSignIn(email, password) {
@@ -147,7 +147,7 @@ export class SignInComponent extends Component {
             authToken : token
           });
           this.storeData(responseJson)
-          this.props.navigation.navigate('transfer', {
+          this.props.navigation.navigate('home', {
             data: this.state.authToken
           });
          return responseJson

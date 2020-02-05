@@ -117,8 +117,17 @@ const styles = StyleSheet.create({
 
 export class RecipeFeedComponent extends Component {
   static navigationOptions = {
-    headerShown: false
-  };
+    headerShown : false,
+    title : '',
+    tabBarIcon: ({ tintColor }) => (
+      <Image
+        source={require('../images/fork.png')}
+        style={{width: 26, height: 26, tintColor: tintColor ,}}
+      />
+    )
+    
+}
+
   constructor(props) {
     super(props)
     this.state = {
@@ -157,7 +166,9 @@ export class RecipeFeedComponent extends Component {
 
   onRecipeClick(item) {
     console.log(item)
-    this.props.navigation.navigate("AddRecipe")
+    this.props.navigation.navigate('RecipeDetail', {
+      id: item.recipeId
+    });
   }
 
   addToFavourite(item) {
@@ -168,7 +179,7 @@ export class RecipeFeedComponent extends Component {
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + data,
+            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -197,7 +208,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -223,7 +234,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + data
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
         },
       }
     ).then((response) => {
@@ -248,7 +259,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + data
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
         },
       }
     ).then((response) => {
@@ -285,9 +296,12 @@ export class RecipeFeedComponent extends Component {
       );
     }
     return (
+      
       <SafeAreaView>
+        
         <ScrollView>
           <View style={{ backgroundColor: '#E4E7EE' }}>
+          
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/meals.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginStart: 5, marginTop: 20 }}>Meals For One</Text>
@@ -332,8 +346,11 @@ export class RecipeFeedComponent extends Component {
               }}
               keyExtractor={item => item.recipeId}
             />
+            
           </View>
+          
           <View style={{ backgroundColor: '#E4E7EE' }}>
+          
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/foodorder.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginStart: 5, marginTop: 20 }}>Orders</Text>

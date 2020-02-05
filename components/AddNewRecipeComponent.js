@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView, SafeAreaView, FlatList, TouchableOpacity,ImageBackground, Button } from 'react-native';
+import { StyleSheet, Text, View,Dimensions, Alert, Image, ScrollView, SafeAreaView, FlatList, TouchableOpacity,ImageBackground, Button } from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield';
@@ -131,6 +131,18 @@ let options = {
 };
 
 export class AddNewRecipeComponent extends Component {
+
+  static navigationOptions = {
+    headerShown : false,
+    title : '',
+    tabBarIcon: ({ tintColor }) => (
+      <Image
+        source={require('../images/plus.png')}
+        style={{width: 26, height: 26, tintColor: tintColor , marginBottom : 10}}
+      />
+    )
+}
+
   constructor() {
     super()
     this.state = {

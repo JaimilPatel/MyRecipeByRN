@@ -3,13 +3,22 @@ import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { SplashComponent } from './components/SplashComponent';
 import { RecipeFeedComponent } from './components/RecipeFeedComponent';
-import { createMaterialTopTabNavigator } from 'react-navigation-tabs';
 import { AddNewRecipeComponent } from './components/AddNewRecipeComponent';
 import { ProfileComponent } from './components/ProfileComponent';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import { RecipeDetailsComponent } from './components/RecipeDetailsComponent';
 
+ const internalNavigator = createStackNavigator({
+   RecipeDetail : {screen : RecipeDetailsComponent}
+ },{
+  initialRouteName : 'RecipeDetail',
+  headerMode: 'none',
+  navigationOptions: {
+      headerVisible: false,
+  }
+})
 
-const mainNavigator = createMaterialBottomTabNavigator({
+ const homeNavigator = createMaterialBottomTabNavigator({
   
   RecipeFeed : {
     screen : RecipeFeedComponent,
@@ -28,22 +37,37 @@ const mainNavigator = createMaterialBottomTabNavigator({
     navigationOptions : {
       tabBarLabel : 'Profile'
     }
-  }
+  },
 },{
-  initialRouteName : 'RecipeFeed'
+  initialRouteName : 'RecipeFeed',
+  headerMode: 'none',
+  navigationOptions: {
+      headerVisible: false,
+  }
 })
-
-const RootStackAuth = createStackNavigator({
+const authNavigator  = createSwitchNavigator({
   Splash: {screen: SplashComponent},
   SignIn: {screen: SignInComponent},
-  transfer : mainNavigator
-});
-
-
-
- const RootStack = createStackNavigator({
-     auth  : RootStackAuth
+  transfer  : homeNavigator
+},{
+  headerMode: 'none',
+  navigationOptions: {
+      headerVisible: false,
+  }
  })
 
-const App = createAppContainer(RootStack);
+const rootNavigator = createStackNavigator({
+  auth : authNavigator,
+  home : homeNavigator , 
+  internal : internalNavigator
+},{
+  initialRouteName : 'auth',
+  headerMode: 'none',
+  navigationOptions: {
+      headerVisible: false,
+  }
+})
+
+
+const App = createAppContainer(rootNavigator);
 export default App;
