@@ -39,6 +39,7 @@ import { RecipeDetailsComponent } from './components/RecipeDetailsComponent';
     }
   },
 },{
+  barStyle: {backgroundColor:'#DC7633'},
   initialRouteName : 'RecipeFeed',
   headerMode: 'none',
   navigationOptions: {

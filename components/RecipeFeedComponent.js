@@ -119,12 +119,19 @@ export class RecipeFeedComponent extends Component {
   static navigationOptions = {
     headerShown : false,
     title : '',
-    tabBarIcon: ({ tintColor }) => (
-      <Image
+    tabBarIcon: ({ focused , tintColor }) => {
+      if (focused) {
+          return  <Image
+          source={require('../images/fork.png')}
+          style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
+        />
+      } else {
+        return  <Image
         source={require('../images/fork.png')}
-        style={{width: 26, height: 26, tintColor: tintColor ,}}
+        style={{ width: 26, height: 26, tintColor: 'white', marginBottom: 10 }}
       />
-    )
+      }
+  }
     
 }
 
@@ -300,7 +307,7 @@ export class RecipeFeedComponent extends Component {
       <SafeAreaView>
         
         <ScrollView>
-          <View style={{ backgroundColor: '#E4E7EE' }}>
+          <View style={{ backgroundColor: '#F9DAC6' }}>
           
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/meals.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
@@ -349,7 +356,7 @@ export class RecipeFeedComponent extends Component {
             
           </View>
           
-          <View style={{ backgroundColor: '#E4E7EE' }}>
+          <View style={{ backgroundColor: '#F9DAC6' }}>
           
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/foodorder.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>

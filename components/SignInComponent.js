@@ -195,7 +195,9 @@ export class SignInComponent extends Component {
           <OutlinedTextField
             label='Your Email'
             keyboardType='email-address'
+            returnKeyType = {"next"}
             ref={this.fieldRef}
+            onSubmitEditing={() => { this.secondTextInput.focus(); }}
             value={this.state.email}
             onChangeText={(email) => this.setState({email})}
           />
@@ -204,7 +206,7 @@ export class SignInComponent extends Component {
           <OutlinedTextField
             label='Password'
             secureTextEntry={true}
-            ref={this.fieldRef}
+            ref={(input) => { this.secondTextInput = input; }}
             value={this.state.password}
             onChangeText={(password) => this.setState({password})}
           />

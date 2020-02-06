@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View,Dimensions, Alert, Image, ScrollView, SafeAreaView, FlatList, TouchableOpacity,ImageBackground, Button } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView, SafeAreaView, FlatList, TouchableOpacity, ImageBackground, Button } from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield';
@@ -34,13 +34,12 @@ const styles = StyleSheet.create({
   },
   touchableButton: {
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor:'#DC7633',
     width: 310,
     justifyContent: "center",
     borderRadius: 10,
     height: 45,
     marginTop: 10,
-    marginBottom: 20
   },
   loginText: {
     textAlign: 'center',
@@ -63,7 +62,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   scrollContainer: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'white',
   },
   imageContainer: {
     borderRadius: 400,
@@ -87,7 +86,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   outLinedTextField: {
-    paddingHorizontal: 50,
+    paddingHorizontal: 20,
     marginTop: 20,
   },
   centerContainer: {
@@ -103,8 +102,8 @@ const styles = StyleSheet.create({
     fontSize: 32,
   },
   textInput: {
-    height: 20,
-    paddingBottom: 40
+    height: 40,
+    paddingBottom: 30
   },
   tag: {
     backgroundColor: '#fff'
@@ -115,8 +114,40 @@ const styles = StyleSheet.create({
   tagContainer: {
     borderWidth: 1,
     borderColor: 'silver',
-    margin: 50
-  }
+    marginTop: 20,
+    marginHorizontal: 20
+  },
+  titleTextColor: {
+    color: 'black',
+    marginStart: 10,
+    fontSize: 18,
+
+  },
+  topTitleContainer: {
+    flex: 1,
+    justifyContent: "space-around",
+    backgroundColor: '#FAE5D3',
+    alignItems: "stretch",
+    width: Dimensions.get('window').width,
+    height: 50,
+    padding: 5,
+    marginHorizontal : 20
+},
+circle: {
+  width: 30,
+  height: 30,
+  borderRadius: 100 / 2,
+  backgroundColor: '#DC7633',
+  justifyContent: 'center',
+  alignItems: "center"
+},
+images: {
+  width: 150,
+  height: 150,
+  marginHorizontal: 3,
+  marginTop : 10,
+  marginStart : 50
+},
 })
 
 let options = {
@@ -130,18 +161,34 @@ let options = {
   },
 };
 
+
+
+
 export class AddNewRecipeComponent extends Component {
 
   static navigationOptions = {
-    headerShown : false,
-    title : '',
-    tabBarIcon: ({ tintColor }) => (
-      <Image
-        source={require('../images/plus.png')}
-        style={{width: 26, height: 26, tintColor: tintColor , marginBottom : 10}}
-      />
-    )
-}
+    headerShown: false,
+    title: '',
+    // tabBarIcon: ({ tintColor }) => (
+    //   <Image
+    //     source={require('../images/plus.png')}
+    //     style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
+    //   />
+    // )
+      tabBarIcon: ({ focused , tintColor }) => {
+        if (focused) {
+            return  <Image
+            source={require('../images/plus.png')}
+            style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
+          />
+        } else {
+          return  <Image
+          source={require('../images/plus.png')}
+          style={{ width: 26, height: 26, tintColor: 'white', marginBottom: 10 }}
+        />
+        }
+    }
+  }
 
   constructor() {
     super()
@@ -163,14 +210,18 @@ export class AddNewRecipeComponent extends Component {
       },
       fileData: '',
       fileUri: '',
-      getFileName : null,
+      getFileName: null,
+      oneIngredient: '',
+      ingredientsArray: [],
+      oneInstruction: '',
+      instructionsArray: [],
     }
   }
 
-  showImagePicker(){
+  showImagePicker() {
     ImagePicker.showImagePicker(options, (response) => {
       console.log('Response = ', response);
-    
+
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -179,18 +230,33 @@ export class AddNewRecipeComponent extends Component {
         console.log('User tapped custom button: ', response.customButton);
       } else {
         const source = { uri: response.uri };
-    
+
         const sourcesecond = { uri: 'data:image/jpeg;base64,' + response.data };
         console.log(source)
         console.log(sourcesecond)
         this.setState({
-         filePath: response,
-         fileData: response.data,
-         fileUri: response.uri,
-         getFileName : response.path
+          filePath: response,
+          fileData: response.data,
+          fileUri: response.uri,
+          getFileName: response.path
         });
       }
     });
+  }
+
+  addToIngredients = () => {
+    var newIngredient = this.state.oneIngredient
+    var arr = this.state.ingredientsArray
+    arr.push(newIngredient)
+    this.setState({ ingredientsArray: arr })
+  }
+
+  addToInstructions = () => {
+    var newInstruction = this.state.oneInstruction
+    var arr = this.state.instructionsArray
+    arr.push(newInstruction)
+    this.setState({ instructionsArray: arr })
+    //alert(this.state.instructionsArray)
   }
 
   updateTagState = (state) => {
@@ -199,8 +265,20 @@ export class AddNewRecipeComponent extends Component {
     })
   };
 
+  updateIngredientState = (state) => {
+    this.setState({
+      ingredients: state
+    })
+  }
+
+  updateInstructionState = (state) => {
+    this.setState({
+      instructions: state
+    })
+  };
   onAddRecipe(recipeName, preprationTime, noOfServes, complexity, youTubeURL, tags) {
-    // alert("Data : " + recipeName + "" + preprationTime + "" + noOfServes + "" + complexity + "" + youTubeURL + "" + tags.tagsArray)
+
+       // alert("Data : " + recipeName + "" + preprationTime + "" + noOfServes + "" + complexity + "" + youTubeURL + "" + tags.tagsArray)
     fetch('http://35.160.197.175:3006/api/v1/recipe/add',
       {
         method: 'POST',
@@ -224,15 +302,85 @@ export class AddNewRecipeComponent extends Component {
       }
     }).then((responseJson) => {
       const { id } = responseJson
-      alert(id)
+      //alert(id)
+      this.addIngredientsAndInstruction(id)
       this.onUpdateRecipePhoto(id)
     }).catch((error) => {
       console.log(error)
     });
   }
 
+  addIngredientsAndInstruction(id) {
+    const data = this.props.navigation.getParam('data', '');
+
+    for (var ingre in this.state.ingredientsArray) {
+      fetch('http://35.160.197.175:3006/api/v1/recipe/add-ingredient',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'ingredient': this.state.ingredientsArray[ingre].toString(),
+            'recipeId': id,
+          })
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          return response.json()
+        } else {
+        }
+      }).then((responseJson) => {
+        console.log("All ingredients Added")
+      }).catch((error) => {
+        console.log(error)
+      });
+    }
+    for (var inst in this.state.instructionsArray) {
+      fetch('http://35.160.197.175:3006/api/v1/recipe/add-instruction',
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            'instruction': this.state.instructionsArray[inst].toString(),
+            'recipeId': id,
+          })
+        }
+      ).then((response) => {
+        if (response.status == 200) {
+          return response.json()
+        } else {
+        }
+      }).then((responseJson) => {
+        console.log("All instruction Added")
+      }).catch((error) => {
+        console.log(error)
+      });
+    }
+
+  }
+
+ 
+
   onUpdateRecipePhoto(id) {
-    alert ("File Data "+this.state.fileData)
+    const createFormData = (photo, body) => {
+      const data = new FormData();
+      var photo = {
+          uri: this.state.fileUri,
+          type: 'image/jpeg',
+          name: 'photo.jpg',
+      };
+      data.append("photo", photo);
+    
+      data.append("recipeId",570)
+      console.log("RecipeData "+data);
+      
+      return data;
+    };
     fetch('http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo',
       {
         method: 'POST',
@@ -240,13 +388,7 @@ export class AddNewRecipeComponent extends Component {
           'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
           'Content-Type': 'application/x-www-form-urlencoded'
         },
-        body: JSON.stringify({
-          'recipeId': id,
-          'photo':
-          [ 
-            { name: 'file', filename: this.state.filepath.fileName, type: this.state.filePath.type, data: this.state.fileData }
-          ]
-        })
+       body :  createFormData(this.state.filePath, { recipeId: 570} )
       }
     ).then((response) => {
       if (response.status == 200) {
@@ -254,13 +396,26 @@ export class AddNewRecipeComponent extends Component {
       } else {
       }
     }).then((responseJson) => {
-      alert("Photo Added of "+id)
+
     }).catch((error) => {
-      console.log(error)
+      console.log('RRRRRRR'+error)
     });
+    console.log('Api calling is done')
   }
 
-
+  renderFileUri() {
+    if (this.state.fileUri) {
+      return <Image
+        source={{ uri: this.state.fileUri }}
+        style={styles.images}
+      />
+    } else {
+      return <Image
+        source={require('../images/recipe.png')}
+        style={styles.images}
+      />
+    }
+  }
 
   render() {
     let data = [{
@@ -273,6 +428,15 @@ export class AddNewRecipeComponent extends Component {
     return (
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
+          <View style={{ backgroundColor:'#DC7633', height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ flexDirection: 'row', }}>
+              <Image
+                style={{ width: 30, height: 30, }}
+                source={require('../images/cooking.png')}
+              />
+              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Add New Recipe</Text>
+            </View>
+          </View>
           <View style={styles.outLinedTextField}>
             <OutlinedTextField
               label='Recipe Name'
@@ -314,7 +478,6 @@ export class AddNewRecipeComponent extends Component {
               updateState={this.updateTagState}
               tags={this.state.tags}
               placeholder="Tags"
-              label='Tags'
               labelStyle={{ color: '#fff' }}
               // leftElement={<Icon name={'tag-multiple'} type={'material-community'} color={this.state.tagsText}/>}
               inputContainerStyle={[styles.textInput,]}
@@ -326,7 +489,72 @@ export class AddNewRecipeComponent extends Component {
               tagTextStyle={styles.tagText}
               keysForTag={', '} />
           </View>
-          <View style={[styles.outLinedTextField, { marginTop: 5 }]}>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={[styles.outLinedTextField, { marginTop: 20, flex: 0.9 }]}>
+              <OutlinedTextField
+                label='Click Below to Add One Ingredient'
+                keyboardType='default'
+                ref={this.fieldRef}
+                value={this.state.oneIngredient}
+                onChangeText={(oneIngredient) => this.setState({ oneIngredient })}
+              />
+            </View>
+            <TouchableOpacity style={[styles.touchableButton, {
+              width: 50, height: 50, marginTop: 20,
+            }]} onPress={() => this.addToIngredients()}>
+              <Text style={{ color: 'black', fontSize: 30 }}>+</Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+          style = {{marginTop : 5}}
+          data={this.state.ingredientsArray}
+          renderItem={({ item , index }) => {
+            return  <View key={index}>
+                        <View style={styles.topTitleContainer}>
+                            <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50 }}>
+                                <View style={styles.circle}>
+                                    <Text>{index}</Text>
+                                </View>
+                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.state.ingredientsArray[index].toString()}</Text>
+                            </View>
+                        </View>
+                    </View>
+          }}
+          extraData={this.state}  // This is the Key you need to privde extra data parmater
+        />
+          <View style={{ flexDirection: 'row' }}>
+          <View style={[styles.outLinedTextField, { marginTop: 20 , flex : 0.9 }]}>
+            <OutlinedTextField
+              label='Click Below to Add One Instruction'
+              keyboardType='default'
+              ref={this.fieldRef}
+              value={this.state.oneInstruction}
+              onChangeText={(oneInstruction) => this.setState({ oneInstruction })}
+            />
+          </View>
+            <TouchableOpacity style={[styles.touchableButton, { width: 50, height: 50 ,marginTop: 20,}]} onPress={() => this.addToInstructions()}>
+              <Text style={{ color: 'black', fontSize: 30 }}>+</Text>
+            </TouchableOpacity>
+          </View>
+          <FlatList
+          style = {{marginTop : 5}}
+          data={this.state.instructionsArray}
+          renderItem={({ item , index }) => {
+            return  <View key={index}>
+                        <View style={styles.topTitleContainer}>
+                            <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50 }}>
+                                <View style={styles.circle}>
+                                    <Text>{index}</Text>
+                                </View>
+                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.state.instructionsArray[index].toString()}</Text>
+                            </View>
+                        </View>
+                    </View>
+          }}
+          extraData={this.state}
+        />
+          <View style={[styles.outLinedTextField, { marginTop: 10 }]}>
             <OutlinedTextField
               label='Youtube URL'
               keyboardType='default'
@@ -336,13 +564,19 @@ export class AddNewRecipeComponent extends Component {
             />
           </View>
           <View style={styles.centerContainer}>
-            <TouchableOpacity style={styles.touchableButton} onPress={() => this.onAddRecipe(this.state.recipeName, this.state.preprationTime, this.state.noOfServes, this.state.complexity, this.state.youTubeURL, this.state.tags)}>
-              <Text style={{ color: 'white' }}>Add Recipe</Text>
+          <View style={{ flexDirection: 'row', alignItems : "center" }}>
+            <TouchableOpacity style={[styles.touchableButton, {height : 50, width : 150}]} onPress={() => this.showImagePicker()}>
+              <Text style={[styles.titleTextColor,{ color: 'black', fontSize : 15 }]}>Upload Image</Text>
+            </TouchableOpacity>
+            <View>
+                {this.renderFileUri()}
+              </View>
+              </View>
+            <TouchableOpacity style={[styles.touchableButton, {marginBottom : 10}]} onPress={() => this.onAddRecipe(this.state.recipeName, this.state.preprationTime, this.state.noOfServes, this.state.complexity, this.state.youTubeURL, this.state.tags)}>
+              <Text style={[styles.titleTextColor,{ color: 'black' , fontSize : 15}]}>Add Recipe</Text>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.touchableButton} onPress={() => this.showImagePicker()}>
-          <Text style={{ color: 'white' }}>Image Picker</Text>
-          </TouchableOpacity>
+
         </View>
       </ScrollView>
     )
