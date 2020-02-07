@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import { View, ImageBackground, Dimensions, StyleSheet, Image, Text, TouchableOpacity, Button, StatusBar } from 'react-native'
-import { ScrollView } from 'react-native-gesture-handler';
+import { View, ImageBackground, Dimensions, StyleSheet, Image, Text, TouchableOpacity, Button, StatusBar , Share} from 'react-native'
+import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import DataLoadingComponent from './DataLoadingComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -82,7 +82,9 @@ export class RecipeDetailsComponent extends Component {
         super()
         this.state = {
             id: null,
+            recipeName : '',
             imageUrl: '',
+            youtubeUrl : '',
             serves: null,
             complexity: '',
             preparationTime: '',
@@ -93,6 +95,7 @@ export class RecipeDetailsComponent extends Component {
             ingredientSelectedButton: false,
             isLoading: false,
             isRefreshing: true,
+            TextInputValueHolder : ''
         }
     }
 
@@ -109,6 +112,17 @@ export class RecipeDetailsComponent extends Component {
         if (!this.state.instructionSelectedButton) {
             this.setState({ instructionSelectedButton: true, ingredientSelectedButton: false })
         }
+    }
+
+    onShareData = () =>{
+        const recipeMessage = "Recipe Name : "+this.state.recipeName+"\n Complexity"+this.state.complexity+"\n Youtube Link"+this.state.youtubeUrl
+        this.setState({
+            TextInputValueHolder : recipeMessage
+        })
+        Share.share(
+            {
+              message: this.state.TextInputValueHolder.toString()
+            }).then(result => console.log(result)).catch(errorMsg => console.log(errorMsg));
     }
 
     getRecipeDetails() {
@@ -132,6 +146,8 @@ export class RecipeDetailsComponent extends Component {
             const { complexity } = responseJson
             const { ingredients } = responseJson
             const { instructions } = responseJson
+            const {name} = responseJson
+            const {ytUrl} = responseJson
             var ingredientsArray = []
             var instructionArray = []
             for (var ingredientData in ingredients) {
@@ -147,6 +163,8 @@ export class RecipeDetailsComponent extends Component {
                 instructionDataSource: instructionArray
             })
             this.setState({
+                youtubeUrl : ytUrl,
+                recipeName : name,
                 imageUrl: photo,
                 serves: serves,
                 complexity: complexity,
@@ -229,6 +247,11 @@ export class RecipeDetailsComponent extends Component {
                             <View style={styles.combineRowContainer}>
                                 <Image source={require('../images/clock.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
                                 <Text style={styles.textStyle}>{this.state.preparationTime}</Text>
+                            </View>
+                            <View style={styles.combineRowContainer}>
+                            <TouchableWithoutFeedback  onPress = {()=> this.onShareData()} >
+                                <Image source={require('../images/share.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                </TouchableWithoutFeedback>
                             </View>
                         </View>
                     </View>

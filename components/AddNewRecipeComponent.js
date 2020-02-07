@@ -215,8 +215,26 @@ export class AddNewRecipeComponent extends Component {
       ingredientsArray: [],
       oneInstruction: '',
       instructionsArray: [],
+      pickedImage : undefined
     }
   }
+
+  pickImageHandler = () => {
+    ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
+        if (res.didCancel) {
+            console.log("User cancelled!");
+            // this.props.navigation.popToTop()
+        } else if (res.error) {
+            console.log("Error", res.error);
+        } else {
+            this.setState({
+                pickedImage: { uri: res.uri }
+            });
+
+        }
+    });
+}
+
 
   showImagePicker() {
     ImagePicker.showImagePicker(options, (response) => {
@@ -364,31 +382,30 @@ export class AddNewRecipeComponent extends Component {
 
   }
 
- 
+ createFormData = (id) => {
+    const data = new FormData();
+    var photo = {
+        uri: this.state.pickedImage.uri,
+        type: 'image/png',
+        name: 'photo.png',
+    };
+    data.append("photo", photo);
+  
+    data.append("recipeId",id)
+    console.log("RecipeData "+data);
+    console.log("ID:"+id+" URI : "+this.state.pickedImage.uri)
+    return data;
+  };
 
   onUpdateRecipePhoto(id) {
-    const createFormData = (photo, body) => {
-      const data = new FormData();
-      var photo = {
-          uri: this.state.fileUri,
-          type: 'image/jpeg',
-          name: 'photo.jpg',
-      };
-      data.append("photo", photo);
     
-      data.append("recipeId",570)
-      console.log("RecipeData "+data);
-      
-      return data;
-    };
     fetch('http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo',
       {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
-          'Content-Type': 'application/x-www-form-urlencoded'
         },
-       body :  createFormData(this.state.filePath, { recipeId: 570} )
+       body :  this.createFormData(id)
       }
     ).then((response) => {
       if (response.status == 200) {
@@ -404,17 +421,17 @@ export class AddNewRecipeComponent extends Component {
   }
 
   renderFileUri() {
-    if (this.state.fileUri) {
-      return <Image
-        source={{ uri: this.state.fileUri }}
-        style={styles.images}
-      />
-    } else {
-      return <Image
-        source={require('../images/recipe.png')}
-        style={styles.images}
-      />
-    }
+    // if (this.state.pickedImage.uri) {
+    //   return <Image
+    //     source={{ uri: this.state.pickedImage.uri }}
+    //     style={styles.images}
+    //   />
+    // } else {
+    //   return <Image
+    //     source={require('../images/recipe.png')}
+    //     style={styles.images}
+    //   />
+    // }
   }
 
   render() {
@@ -565,7 +582,7 @@ export class AddNewRecipeComponent extends Component {
           </View>
           <View style={styles.centerContainer}>
           <View style={{ flexDirection: 'row', alignItems : "center" }}>
-            <TouchableOpacity style={[styles.touchableButton, {height : 50, width : 150}]} onPress={() => this.showImagePicker()}>
+            <TouchableOpacity style={[styles.touchableButton, {height : 50, width : 150}]} onPress={() => this.pickImageHandler()}>
               <Text style={[styles.titleTextColor,{ color: 'black', fontSize : 15 }]}>Upload Image</Text>
             </TouchableOpacity>
             <View>
