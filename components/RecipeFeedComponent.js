@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import { View, FlatList, SafeAreaView, RefreshControl, ImageBackground, TouchableWithoutFeedback, Text, StyleSheet, Alert, Dimensions, Image, AsyncStorage } from 'react-native'
+import { View, FlatList, SafeAreaView, RefreshControl, ImageBackground, TouchableWithoutFeedback, Text, StyleSheet, Alert, Dimensions, Image } from 'react-native'
 import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
+import { SearchBar } from 'react-native-elements';
 
 const placholder = require('../images/loaderfood.gif')
 
@@ -117,23 +118,23 @@ const styles = StyleSheet.create({
 
 export class RecipeFeedComponent extends Component {
   static navigationOptions = {
-    headerShown : false,
-    title : '',
-    tabBarIcon: ({ focused , tintColor }) => {
+    headerShown: false,
+    title: '',
+    tabBarIcon: ({ focused, tintColor }) => {
       if (focused) {
-          return  <Image
+        return <Image
           source={require('../images/fork.png')}
           style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
         />
       } else {
-        return  <Image
-        source={require('../images/fork.png')}
-        style={{ width: 26, height: 26, tintColor: 'white', marginBottom: 10 }}
-      />
+        return <Image
+          source={require('../images/fork.png')}
+          style={{ width: 26, height: 26, tintColor: 'white', marginBottom: 10 }}
+        />
       }
+    }
+
   }
-    
-}
 
   constructor(props) {
     super(props)
@@ -143,19 +144,12 @@ export class RecipeFeedComponent extends Component {
       dataFeedSource: [],
       dataFavouriteSource: [],
       isRefreshing: true,
-      authToken: ''
+      authToken: '',
+      value: ''
     }
+    this.arrayHolder = [];
   }
-  onPostClick = (item) => {
-    Alert.alert(
-      item.name,
-      item.firstName + " " + item.lastName,
-      [
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
-      ],
-      { cancelable: false },
-    );
-  }
+
   refreshList() {
     this.setState({ isRefreshing: true, isLoading: true }, function () { this.getFeedList(), this.getFavouriteRecipeList() });
     setTimeout(() => {
@@ -167,14 +161,13 @@ export class RecipeFeedComponent extends Component {
   onShare
 
   onLikeClick(item) {
-    console.log("RecipeId click " + item.recipeId)
     this.addToFavourite(item)
   }
 
   onRecipeClick(item) {
-    console.log(item)
     this.props.navigation.navigate('RecipeDetail', {
-      id: item.recipeId
+      id: item.recipeId,
+      data : data
     });
   }
 
@@ -186,7 +179,7 @@ export class RecipeFeedComponent extends Component {
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Authorization': 'Bearer ' + data,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -215,7 +208,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+          'Authorization': 'Bearer ' + data,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -241,7 +234,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
+          'Authorization': 'Bearer ' + data
         },
       }
     ).then((response) => {
@@ -266,7 +259,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
+          'Authorization': 'Bearer ' + data
         },
       }
     ).then((response) => {
@@ -280,10 +273,65 @@ export class RecipeFeedComponent extends Component {
         dataFeedSource: responseJson,
         isRefreshing: false
       });
+      this.arrayHolder = responseJson
     }).catch((error) => {
       console.log(error)
     });
   }
+
+  renderSeparator = () => {
+    return (
+      <View
+        style={{
+          height: 1,
+          width: '86%',
+          backgroundColor: '#000000',
+          marginLeft: '14%',
+        }}
+      />
+    );
+  };
+
+  renderHeader = () => {
+    return (
+      <View style={{ paddingHorizontal: 10 }}>
+        <SearchBar
+          autoCorrect={false}
+          autoFocus={true}
+          placeholder="Search Your Recipe Here......"
+          placeholderTextColor='silver'
+          onChangeText={text => this.searchFilterFunction(text)}
+          value={this.state.value}
+          autoFocus={false}
+          lightTheme={true}
+          containerStyle={{ backgroundColor: '#F9DAC6' }}
+          inputContainerStyle={{ backgroundColor: 'white' }}
+          round={true}
+          clearIcon={null}
+          color='black'
+          searchIcon={null}
+          icon={{ type: 'font-awesome', name: 'search' }}
+          ref={search => this.search = search}
+
+        />
+      </View>
+    );
+  };
+
+  searchFilterFunction = text => {
+    this.setState({
+      value: text,
+    });
+
+    const newData = this.arrayHolder.filter(item => {
+      const itemData = `${item.name.toUpperCase()}`;
+      const textData = text.toUpperCase();
+      return itemData.indexOf(textData) > -1;
+    });
+    this.setState({
+      dataFeedSource: newData,
+    });
+  };
 
   componentDidMount() {
 
@@ -303,12 +351,11 @@ export class RecipeFeedComponent extends Component {
       );
     }
     return (
-      
+
       <SafeAreaView>
-        
+
         <ScrollView>
           <View style={{ backgroundColor: '#F9DAC6' }}>
-          
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/meals.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginStart: 5, marginTop: 20 }}>Meals For One</Text>
@@ -332,7 +379,7 @@ export class RecipeFeedComponent extends Component {
                 return <View style={styles.horizontalImageViewContainer}>
                   <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
                     <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 50 }}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource = {placholder} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
+                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={placholder} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
                       </ImageBackground>
                     </TouchableWithoutFeedback>
@@ -353,11 +400,11 @@ export class RecipeFeedComponent extends Component {
               }}
               keyExtractor={item => item.recipeId}
             />
-            
+
           </View>
-          
+
           <View style={{ backgroundColor: '#F9DAC6' }}>
-          
+
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/foodorder.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginStart: 5, marginTop: 20 }}>Orders</Text>
@@ -390,7 +437,7 @@ export class RecipeFeedComponent extends Component {
                       </TouchableWithoutFeedback>
                     </View>
                     <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')}  style={[styles.imageContainer, { height: 178, marginBottom: 10 }]} resizeMode="cover">
+                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.imageContainer, { height: 178, marginBottom: 10 }]} resizeMode="cover">
                         <View style={styles.transparentContainer}>
                           <View style={styles.rowContainer}>
                             <View style={styles.combineRowContainer}>
@@ -413,6 +460,7 @@ export class RecipeFeedComponent extends Component {
                 );
               }}
               keyExtractor={item => item.recipeId}
+              ListHeaderComponent={this.renderHeader}
             />
           </View>
         </ScrollView>

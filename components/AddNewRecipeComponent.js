@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Alert, Image, ScrollView, SafeAreaView, FlatList, TouchableOpacity, ImageBackground, Button } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Image, ScrollView,FlatList, TouchableOpacity} from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield';
-import { DropDown, Dropdown } from 'react-native-material-dropdown'
+import {Dropdown } from 'react-native-material-dropdown'
 import TagInput from 'react-native-tags-input';
 import ImagePicker from 'react-native-image-picker';
+import AsyncStorage from '@react-native-community/async-storage'
 
 const mainColor = '#3ca897';
 
@@ -150,31 +151,11 @@ images: {
 },
 })
 
-let options = {
-  title: 'Select Image',
-  customButtons: [
-    { name: 'customOptionKey', title: 'Choose Photo from Custom Option' },
-  ],
-  storageOptions: {
-    skipBackup: true,
-    path: 'images',
-  },
-};
-
-
-
-
 export class AddNewRecipeComponent extends Component {
 
   static navigationOptions = {
     headerShown: false,
     title: '',
-    // tabBarIcon: ({ tintColor }) => (
-    //   <Image
-    //     source={require('../images/plus.png')}
-    //     style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
-    //   />
-    // )
       tabBarIcon: ({ focused , tintColor }) => {
         if (focused) {
             return  <Image
@@ -204,64 +185,34 @@ export class AddNewRecipeComponent extends Component {
       tagsColor: mainColor,
       tagsText: '#fff',
       youTubeURL: '',
-      filepath: {
-        data: '',
-        uri: ''
-      },
-      fileData: '',
-      fileUri: '',
-      getFileName: null,
       oneIngredient: '',
       ingredientsArray: [],
       oneInstruction: '',
       instructionsArray: [],
-      pickedImage : undefined
+      uploadImage : undefined,
+      uploadImageUri : '',
+      getToken : ''
     }
   }
 
-  pickImageHandler = () => {
+  componentDidMount() {
+    this.retrieveData()
+  }
+
+  showImagePicker = () => {
     ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
         if (res.didCancel) {
-            console.log("User cancelled!");
-            // this.props.navigation.popToTop()
         } else if (res.error) {
             console.log("Error", res.error);
         } else {
             this.setState({
-                pickedImage: { uri: res.uri }
+                uploadImage: { uri: res.uri },
+                uploadImageUri : res.uri
             });
 
         }
     });
 }
-
-
-  showImagePicker() {
-    ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
-
-      if (response.didCancel) {
-        console.log('User cancelled image picker');
-      } else if (response.error) {
-        console.log('ImagePicker Error: ', response.error);
-      } else if (response.customButton) {
-        console.log('User tapped custom button: ', response.customButton);
-      } else {
-        const source = { uri: response.uri };
-
-        const sourcesecond = { uri: 'data:image/jpeg;base64,' + response.data };
-        console.log(source)
-        console.log(sourcesecond)
-        this.setState({
-          filePath: response,
-          fileData: response.data,
-          fileUri: response.uri,
-          getFileName: response.path
-        });
-      }
-    });
-  }
-
   addToIngredients = () => {
     var newIngredient = this.state.oneIngredient
     var arr = this.state.ingredientsArray
@@ -274,7 +225,6 @@ export class AddNewRecipeComponent extends Component {
     var arr = this.state.instructionsArray
     arr.push(newInstruction)
     this.setState({ instructionsArray: arr })
-    //alert(this.state.instructionsArray)
   }
 
   updateTagState = (state) => {
@@ -283,25 +233,24 @@ export class AddNewRecipeComponent extends Component {
     })
   };
 
-  updateIngredientState = (state) => {
-    this.setState({
-      ingredients: state
-    })
-  }
-
-  updateInstructionState = (state) => {
-    this.setState({
-      instructions: state
-    })
+  retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('authTokenStore');
+      if (value !== null) {
+        this.setState({ getToken: value })
+      }
+    } catch (error) {
+      alert(error)
+    }
   };
-  onAddRecipe(recipeName, preprationTime, noOfServes, complexity, youTubeURL, tags) {
 
-       // alert("Data : " + recipeName + "" + preprationTime + "" + noOfServes + "" + complexity + "" + youTubeURL + "" + tags.tagsArray)
+  onAddRecipe(recipeName, preprationTime, noOfServes, complexity, youTubeURL, tags) {
+    const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/add',
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+          'Authorization': 'Bearer ' + data,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -320,9 +269,7 @@ export class AddNewRecipeComponent extends Component {
       }
     }).then((responseJson) => {
       const { id } = responseJson
-      //alert(id)
-      this.addIngredientsAndInstruction(id)
-      this.onUpdateRecipePhoto(id)
+      this.addIngredientsAndInstruction(id)      
     }).catch((error) => {
       console.log(error)
     });
@@ -330,13 +277,12 @@ export class AddNewRecipeComponent extends Component {
 
   addIngredientsAndInstruction(id) {
     const data = this.props.navigation.getParam('data', '');
-
     for (var ingre in this.state.ingredientsArray) {
       fetch('http://35.160.197.175:3006/api/v1/recipe/add-ingredient',
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Authorization': 'Bearer ' + data,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -350,7 +296,7 @@ export class AddNewRecipeComponent extends Component {
         } else {
         }
       }).then((responseJson) => {
-        console.log("All ingredients Added")
+        this.onUpdateRecipePhoto(id)
       }).catch((error) => {
         console.log(error)
       });
@@ -360,7 +306,7 @@ export class AddNewRecipeComponent extends Component {
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Authorization': 'Bearer ' + data,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -374,7 +320,6 @@ export class AddNewRecipeComponent extends Component {
         } else {
         }
       }).then((responseJson) => {
-        console.log("All instruction Added")
       }).catch((error) => {
         console.log(error)
       });
@@ -385,25 +330,22 @@ export class AddNewRecipeComponent extends Component {
  createFormData = (id) => {
     const data = new FormData();
     var photo = {
-        uri: this.state.pickedImage.uri,
+        uri: this.state.uploadImage.uri,
         type: 'image/png',
         name: 'photo.png',
     };
     data.append("photo", photo);
-  
     data.append("recipeId",id)
-    console.log("RecipeData "+data);
-    console.log("ID:"+id+" URI : "+this.state.pickedImage.uri)
     return data;
   };
 
   onUpdateRecipePhoto(id) {
-    
+    const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo',
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+          'Authorization': 'Bearer ' + data,
         },
        body :  this.createFormData(id)
       }
@@ -415,23 +357,22 @@ export class AddNewRecipeComponent extends Component {
     }).then((responseJson) => {
 
     }).catch((error) => {
-      console.log('RRRRRRR'+error)
+      console.log(error)
     });
-    console.log('Api calling is done')
   }
 
   renderFileUri() {
-    // if (this.state.pickedImage.uri) {
-    //   return <Image
-    //     source={{ uri: this.state.pickedImage.uri }}
-    //     style={styles.images}
-    //   />
-    // } else {
-    //   return <Image
-    //     source={require('../images/recipe.png')}
-    //     style={styles.images}
-    //   />
-    // }
+    if (this.state.uploadImageUri) {
+      return <Image
+        source={{ uri: this.state.uploadImage.uri }}
+        style={styles.images}
+      />
+    } else {
+      return <Image
+        source={require('../images/noimage.jpg')}
+        style={styles.images}
+      />
+    }
   }
 
   render() {
@@ -496,7 +437,6 @@ export class AddNewRecipeComponent extends Component {
               tags={this.state.tags}
               placeholder="Tags"
               labelStyle={{ color: '#fff' }}
-              // leftElement={<Icon name={'tag-multiple'} type={'material-community'} color={this.state.tagsText}/>}
               inputContainerStyle={[styles.textInput,]}
               inputStyle={{ color: this.state.tagsText }}
               onFocus={() => this.setState({ tagsColor: '#fff', tagsText: mainColor })}
@@ -538,7 +478,7 @@ export class AddNewRecipeComponent extends Component {
                         </View>
                     </View>
           }}
-          extraData={this.state}  // This is the Key you need to privde extra data parmater
+          extraData={this.state} 
         />
           <View style={{ flexDirection: 'row' }}>
           <View style={[styles.outLinedTextField, { marginTop: 20 , flex : 0.9 }]}>
@@ -582,7 +522,7 @@ export class AddNewRecipeComponent extends Component {
           </View>
           <View style={styles.centerContainer}>
           <View style={{ flexDirection: 'row', alignItems : "center" }}>
-            <TouchableOpacity style={[styles.touchableButton, {height : 50, width : 150}]} onPress={() => this.pickImageHandler()}>
+            <TouchableOpacity style={[styles.touchableButton, {height : 50, width : 150}]} onPress={() => this.showImagePicker()}>
               <Text style={[styles.titleTextColor,{ color: 'black', fontSize : 15 }]}>Upload Image</Text>
             </TouchableOpacity>
             <View>

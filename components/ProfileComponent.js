@@ -2,6 +2,7 @@ import React, { Component } from 'react'
 import { View, Image, StyleSheet, Text, FlatList, Dimensions, RefreshControl, ImageBackground } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TouchableWithoutFeedback, ScrollView } from 'react-native-gesture-handler'
+import AsyncStorage from '@react-native-community/async-storage'
 
 const styles = StyleSheet.create({
 
@@ -126,30 +127,44 @@ export class ProfileComponent extends Component {
   static navigationOptions = {
     headerShown: false,
     title: '',
-    tabBarIcon: ({ focused , tintColor }) => {
+    tabBarIcon: ({ focused, tintColor }) => {
       if (focused) {
-          return  <Image
+        return <Image
           source={require('../images/user.png')}
           style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
         />
       } else {
-        return  <Image
-        source={require('../images/user.png')}
-        style={{ width: 26, height: 26, tintColor: 'white' ,marginBottom: 10 }}
-      />
+        return <Image
+          source={require('../images/user.png')}
+          style={{ width: 26, height: 26, tintColor: 'white', marginBottom: 10 }}
+        />
       }
-  }
+    }
   }
 
   constructor() {
     super()
     this.state = {
       dataFavouriteFeedSource: [],
-      getFirstName : '',
-      getLastName : ''
+      getFirstName: '',
+      getLastName: '',
+      getAuthorizedToken: ''
     }
   }
+
+  retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('authTokenStore');
+      if (value !== null) {
+        this.setState({ getAuthorizedToken: value })
+      }
+    } catch (error) {
+      alert(error)
+    }
+  };
+
   componentDidMount() {
+    this.retrieveData()
     this.getFavouriteRecipeList()
   }
 
@@ -159,7 +174,7 @@ export class ProfileComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
+          'Authorization': 'Bearer ' + data
         },
       }
     ).then((response) => {
@@ -168,21 +183,21 @@ export class ProfileComponent extends Component {
       } else {
       }
     }).then((responseJson) => {
-      const {firstName} = responseJson[0]
-      const {lastName} = responseJson[0]
+      const { firstName } = responseJson[0]
+      const { lastName } = responseJson[0]
       this.setState({
         dataFavouriteFeedSource: responseJson,
-        getFirstName : firstName,
-        getLastName : lastName
+        getFirstName: firstName,
+        getLastName: lastName
       });
-      
+
     }).catch((error) => {
       console.log(error)
     });
   }
   render() {
     return (
-      <SafeAreaView style= {{backgroundColor : '#F9DAC6'}}>
+      <SafeAreaView style={{ backgroundColor: '#F9DAC6' }}>
         <ScrollView>
           <View>
             <View style={styles.centerContainer}>
@@ -192,16 +207,16 @@ export class ProfileComponent extends Component {
                 resizeMode="cover"
               />
             </View>
-            <View style={{height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>{this.state.getFirstName+' '+this.state.getLastName}</Text>
+            <View style={{ height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>{this.state.getFirstName + ' ' + this.state.getLastName}</Text>
             </View>
-              <View style={{ flexDirection: 'row', marginStart: 10 }}>
-                <Image
-                  style={{ width: 30, height: 30, marginStart: 10}}
-                  source={require('../images/cooking.png')}
-                />
-                <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Easy Recipes For Beginners</Text>
-              </View>
+            <View style={{ flexDirection: 'row', marginStart: 10 }}>
+              <Image
+                style={{ width: 30, height: 30, marginStart: 10 }}
+                source={require('../images/cooking.png')}
+              />
+              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Easy Recipes For Beginners</Text>
+            </View>
             <FlatList
               refreshControl={
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
@@ -230,13 +245,13 @@ export class ProfileComponent extends Component {
               }}
               keyExtractor={item => item.recipeId}
             />
-              <View style={{ flexDirection: 'row', marginStart: 10 }}>
-                <Image
-                  style={{ width: 30, height: 30, marginStart: 10}}
-                  source={require('../images/cooking.png')}
-                />
-                <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Medium Recipes For Learners</Text>
-              </View>
+            <View style={{ flexDirection: 'row', marginStart: 10 }}>
+              <Image
+                style={{ width: 30, height: 30, marginStart: 10 }}
+                source={require('../images/cooking.png')}
+              />
+              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Medium Recipes For Learners</Text>
+            </View>
             <FlatList
               refreshControl={
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
@@ -265,13 +280,13 @@ export class ProfileComponent extends Component {
               }}
               keyExtractor={item => item.recipeId}
             />
-              <View style={{ flexDirection: 'row', marginStart: 10 }}>
-                <Image
-                  style={{ width: 30, height: 30, marginStart: 10}}
-                  source={require('../images/cooking.png')}
-                />
-                <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Complex Recipes For Experts</Text>
-              </View>
+            <View style={{ flexDirection: 'row', marginStart: 10 }}>
+              <Image
+                style={{ width: 30, height: 30, marginStart: 10 }}
+                source={require('../images/cooking.png')}
+              />
+              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Complex Recipes For Experts</Text>
+            </View>
             <FlatList
               refreshControl={
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>

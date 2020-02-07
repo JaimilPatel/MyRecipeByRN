@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
-import { View, ImageBackground, Dimensions, StyleSheet, Image, Text, TouchableOpacity, Button, StatusBar , Share} from 'react-native'
+import { View, Dimensions, StyleSheet, Image, Text, TouchableOpacity, Share } from 'react-native'
 import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
 import DataLoadingComponent from './DataLoadingComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebView } from 'react-native-webview'
+import AsyncStorage from '@react-native-community/async-storage'
 
 const styles = StyleSheet.create({
 
@@ -37,7 +39,7 @@ const styles = StyleSheet.create({
         height: 50,
         padding: 5,
     },
-    
+
     titleTextColor: {
         color: 'black',
         marginStart: 10,
@@ -82,9 +84,9 @@ export class RecipeDetailsComponent extends Component {
         super()
         this.state = {
             id: null,
-            recipeName : '',
+            recipeName: '',
             imageUrl: '',
-            youtubeUrl : '',
+            youtubeUrl: '',
             serves: null,
             complexity: '',
             preparationTime: '',
@@ -95,9 +97,21 @@ export class RecipeDetailsComponent extends Component {
             ingredientSelectedButton: false,
             isLoading: false,
             isRefreshing: true,
-            TextInputValueHolder : ''
+            TextInputValueHolder: '',
+            getToken: ''
         }
     }
+
+    retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('authTokenStore');
+            if (value !== null) {
+                this.setState({ getToken: value })
+            }
+        } catch (error) {
+            alert(error)
+        }
+    };
 
     onShowIngredients() {
 
@@ -114,23 +128,24 @@ export class RecipeDetailsComponent extends Component {
         }
     }
 
-    onShareData = () =>{
-        const recipeMessage = "Recipe Name : "+this.state.recipeName+"\n Complexity"+this.state.complexity+"\n Youtube Link"+this.state.youtubeUrl
+    onShareData = () => {
+        const recipeMessage = "Recipe Name : " + this.state.recipeName + "\n Complexity : " + this.state.complexity + "\n Youtube Link : " + this.state.youtubeUrl
         this.setState({
-            TextInputValueHolder : recipeMessage
+            TextInputValueHolder: recipeMessage
         })
         Share.share(
             {
-              message: this.state.TextInputValueHolder.toString()
+                message: this.state.TextInputValueHolder.toString()
             }).then(result => console.log(result)).catch(errorMsg => console.log(errorMsg));
     }
 
     getRecipeDetails() {
         const recipeId = this.props.navigation.getParam('id', '');
+        const data = this.props.navigation.getParam('data', '');
         fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/details', {
             method: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+                'Authorization': 'Bearer ' + data,
             }
         }).then((response) => {
             if (response.status == 200) {
@@ -146,8 +161,8 @@ export class RecipeDetailsComponent extends Component {
             const { complexity } = responseJson
             const { ingredients } = responseJson
             const { instructions } = responseJson
-            const {name} = responseJson
-            const {ytUrl} = responseJson
+            const { name } = responseJson
+            const { ytUrl } = responseJson
             var ingredientsArray = []
             var instructionArray = []
             for (var ingredientData in ingredients) {
@@ -163,8 +178,8 @@ export class RecipeDetailsComponent extends Component {
                 instructionDataSource: instructionArray
             })
             this.setState({
-                youtubeUrl : ytUrl,
-                recipeName : name,
+                youtubeUrl: ytUrl,
+                recipeName: name,
                 imageUrl: photo,
                 serves: serves,
                 complexity: complexity,
@@ -177,6 +192,7 @@ export class RecipeDetailsComponent extends Component {
         })
     }
     componentDidMount() {
+        this.retrieveData()
         this.setState({
             isLoading: true,
         });
@@ -230,74 +246,80 @@ export class RecipeDetailsComponent extends Component {
 
 
         return (
-             <SafeAreaView>
-            <ScrollView>
-                <View>
-                    <ImageBackground source={{ uri: this.state.imageUrl }}  style={[styles.imageContainer]} resizeMode="cover">
-                    <View style={styles.transparentContainer}>
-                        <View style={styles.rowContainer}>
-                            <View style={styles.combineRowContainer}>
-                                <Image source={require('../images/effort.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                                <Text style={styles.textStyle}>{this.state.complexity}</Text>
+            <SafeAreaView style={{ backgroundColor: '#F9DAC6' }}>
+                <ScrollView>
+                    <View>
+                        <View style={{ height: 230, justifyContent: 'flex-end' }}>
+                            <WebView
+                                javaScriptEnabled={true}
+                                domStorageEnabled={true}
+                                source={{ uri: this.state.youtubeUrl }}
+                            />
+                            <View style={styles.transparentContainer}>
+                                <View style={styles.rowContainer}>
+                                    <View style={styles.combineRowContainer}>
+                                        <Image source={require('../images/effort.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                        <Text style={styles.textStyle}>{this.state.complexity}</Text>
+                                    </View>
+                                    <View style={styles.combineRowContainer}>
+                                        <Image source={require('../images/fork.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                        <Text style={styles.textStyle}>{this.state.serves}</Text>
+                                    </View>
+                                    <View style={styles.combineRowContainer}>
+                                        <Image source={require('../images/clock.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                        <Text style={styles.textStyle}>{this.state.preparationTime}</Text>
+                                    </View>
+                                    <View style={styles.combineRowContainer}>
+                                        <TouchableWithoutFeedback onPress={() => this.onShareData()} >
+                                            <Image source={require('../images/share.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                        </TouchableWithoutFeedback>
+                                    </View>
+                                </View>
                             </View>
-                            <View style={styles.combineRowContainer}>
-                                <Image source={require('../images/fork.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                                <Text style={styles.textStyle}>{this.state.serves}</Text>
-                            </View>
-                            <View style={styles.combineRowContainer}>
-                                <Image source={require('../images/clock.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                                <Text style={styles.textStyle}>{this.state.preparationTime}</Text>
-                            </View>
-                            <View style={styles.combineRowContainer}>
-                            <TouchableWithoutFeedback  onPress = {()=> this.onShareData()} >
-                                <Image source={require('../images/share.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                                </TouchableWithoutFeedback>
-                            </View>
-                        </View>
-                    </View>
-                    </ImageBackground>
-                    <View style={{ flexDirection: "row" }}>
-                        <View style={{ flex: 1 }}>
-                            <TouchableOpacity style={{
-                                alignSelf: 'stretch', backgroundColor:
-                                    this.state.instructionSelectedButton
-                                        ? "#81B2F5"
-                                        : "#2464E5", height : 50
-                            }} onPress={() => this.onShowInstructions()}>
-                                <Text style={{
-                                    alignSelf: 'center',
-                                    color: '#ffffff',
-                                    fontSize: 16,
-                                    fontWeight: '600',
-                                    paddingTop: 14,
-                                    paddingBottom: 10
 
-                                }}>INSTRUCTIONS</Text>
-                            </TouchableOpacity>
                         </View>
-                        <View style={{ borderLeftWidth: 1, borderLeftColor: 'white' }} />
-                        <View style={{ flex: 1 }}>
-                            <TouchableOpacity style={{
-                                alignSelf: 'stretch', backgroundColor:
-                                    this.state.ingredientSelectedButton
-                                        ? "#81B2F5"
-                                        : "#2464E5",height : 50
-                            }} onPress={() => this.onShowIngredients()}>
-                                <Text style={{
-                                    alignSelf: 'center',
-                                    color: '#ffffff',
-                                    fontSize: 16,
-                                    fontWeight: '600',
-                                    paddingTop: 14,
-                                    paddingBottom: 10
-                                }}>INGREDIENTS</Text>
-                            </TouchableOpacity>
+                        <View style={{ flexDirection: "row" }}>
+                            <View style={{ flex: 1 }}>
+                                <TouchableOpacity style={{
+                                    alignSelf: 'stretch', backgroundColor:
+                                        this.state.instructionSelectedButton
+                                            ? "#DC7633"
+                                            : "#F9DAC6", height: 50
+                                }} onPress={() => this.onShowInstructions()}>
+                                    <Text style={{
+                                        alignSelf: 'center',
+                                        color: 'black',
+                                        fontSize: 16,
+                                        fontWeight: '600',
+                                        paddingTop: 14,
+                                        paddingBottom: 10
+
+                                    }}>INSTRUCTIONS</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ borderLeftWidth: 1, borderLeftColor: 'white' }} />
+                            <View style={{ flex: 1 }}>
+                                <TouchableOpacity style={{
+                                    alignSelf: 'stretch', backgroundColor:
+                                        this.state.ingredientSelectedButton
+                                            ? "#DC7633"
+                                            : "#F9DAC6", height: 50
+                                }} onPress={() => this.onShowIngredients()}>
+                                    <Text style={{
+                                        alignSelf: 'center',
+                                        color: 'black',
+                                        fontSize: 16,
+                                        fontWeight: '600',
+                                        paddingTop: 14,
+                                        paddingBottom: 10
+                                    }}>INGREDIENTS</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-                </View>
-                {renderbottomView}
-            </ScrollView>
-            </SafeAreaView>  
+                    {renderbottomView}
+                </ScrollView>
+            </SafeAreaView>
         )
     }
 }
