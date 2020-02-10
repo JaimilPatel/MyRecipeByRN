@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   tagText: {
-    color: mainColor
+    color: '#DC7633'
   },
   tagContainer: {
     borderWidth: 1,
@@ -182,8 +182,8 @@ export class AddNewRecipeComponent extends Component {
         tag: '',
         tagsArray: []
       },
-      tagsColor: mainColor,
-      tagsText: '#fff',
+      tagsColor: '#DC7633',
+      tagsText: '#DC7633',
       youTubeURL: '',
       oneIngredient: '',
       ingredientsArray: [],
@@ -218,6 +218,7 @@ export class AddNewRecipeComponent extends Component {
     var arr = this.state.ingredientsArray
     arr.push(newIngredient)
     this.setState({ ingredientsArray: arr })
+    this.textIngredient.clear()
   }
 
   addToInstructions = () => {
@@ -225,6 +226,7 @@ export class AddNewRecipeComponent extends Component {
     var arr = this.state.instructionsArray
     arr.push(newInstruction)
     this.setState({ instructionsArray: arr })
+    this.textInstruction.clear()
   }
 
   updateTagState = (state) => {
@@ -355,7 +357,7 @@ export class AddNewRecipeComponent extends Component {
       } else {
       }
     }).then((responseJson) => {
-
+      this.props.navigation.navigate('RecipeFeed')
     }).catch((error) => {
       console.log(error)
     });
@@ -401,14 +403,17 @@ export class AddNewRecipeComponent extends Component {
               keyboardType='default'
               ref={this.fieldRef}
               value={this.state.recipeName}
+              tintColor = '#DC7633'
               onChangeText={(recipeName) => this.setState({ recipeName })}
             />
           </View>
           <View style={[styles.outLinedTextField, { marginTop: 5 }]}>
             <OutlinedTextField
+            selectionColor = 'black'
               label='Prepration Time'
               keyboardType='default'
               ref={this.fieldRef}
+              tintColor = '#DC7633'
               value={this.state.preprationTime}
               onChangeText={(preprationTime) => this.setState({ preprationTime })}
             />
@@ -418,6 +423,7 @@ export class AddNewRecipeComponent extends Component {
               label='Serves'
               keyboardType='numeric'
               ref={this.fieldRef}
+              tintColor = '#DC7633'
               value={this.state.noOfServes}
               onChangeText={(noOfServes) => this.setState({ noOfServes })}
             />
@@ -451,7 +457,8 @@ export class AddNewRecipeComponent extends Component {
               <OutlinedTextField
                 label='Click Below to Add One Ingredient'
                 keyboardType='default'
-                ref={this.fieldRef}
+                ref={input => { this.textIngredient = input }}
+                tintColor = '#DC7633'
                 value={this.state.oneIngredient}
                 onChangeText={(oneIngredient) => this.setState({ oneIngredient })}
               />
@@ -485,7 +492,8 @@ export class AddNewRecipeComponent extends Component {
             <OutlinedTextField
               label='Click Below to Add One Instruction'
               keyboardType='default'
-              ref={this.fieldRef}
+              ref={input => { this.textInstruction = input }}
+              tintColor = '#DC7633'
               value={this.state.oneInstruction}
               onChangeText={(oneInstruction) => this.setState({ oneInstruction })}
             />
@@ -516,6 +524,7 @@ export class AddNewRecipeComponent extends Component {
               label='Youtube URL'
               keyboardType='default'
               ref={this.fieldRef}
+              tintColor = '#DC7633'
               value={this.state.youTubeURL}
               onChangeText={(youTubeURL) => this.setState({ youTubeURL })}
             />

@@ -27,7 +27,7 @@ export class SplashComponent extends Component {
     this.retrieveData()
     setTimeout(() => {
       this.load();
-    }, 3000);
+    }, 4000);
   }
   load = () => {
     if (this.state.getAuthToken == '') {
@@ -39,7 +39,7 @@ export class SplashComponent extends Component {
   };
   render() {
     return (
-      <ImageBackground source={{ uri: 'https://www.gojekclone.com/images/food-app/user-app/splash-screen.jpg' }} style={{ width: '100%', height: '100%' }}>
+      <ImageBackground source={{ uri: 'https://format-com-cld-res.cloudinary.com/image/private/s--6VjZBQmK--/c_limit,g_center,h_65535,w_550/fl_keep_iptc.progressive,q_95/v1/d0362d29eaed2a00e2aace5edc65be9e/Pasta_with_Curry-3.jpg' }} style={{ width: '100%', height: '100%' }}>
 
       </ImageBackground>
     )

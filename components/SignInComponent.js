@@ -30,7 +30,7 @@ const styles = StyleSheet.create({
   },
   touchableButton: {
     alignItems: 'center',
-    backgroundColor: 'black',
+    backgroundColor: '#DC7633',
     width: 310,
     justifyContent: "center",
     borderRadius: 10,
@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   scrollContainer: {
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.6)',
   },
   imageContainer: {
     borderRadius: 400,
@@ -191,6 +191,7 @@ export class SignInComponent extends Component {
                 keyboardType='email-address'
                 returnKeyType={"next"}
                 ref={this.fieldRef}
+                tintColor = '#DC7633'
                 onSubmitEditing={() => { this.secondTextInput.focus(); }}
                 value={this.state.email}
                 onChangeText={(email) => this.setState({ email })}
@@ -200,6 +201,7 @@ export class SignInComponent extends Component {
               <OutlinedTextField
                 label='Password'
                 secureTextEntry={true}
+                tintColor = '#DC7633'
                 ref={(input) => { this.secondTextInput = input; }}
                 value={this.state.password}
                 onChangeText={(password) => this.setState({ password })}

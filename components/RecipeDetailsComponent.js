@@ -145,7 +145,7 @@ export class RecipeDetailsComponent extends Component {
         fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/details', {
             method: 'GET',
             headers: {
-                'Authorization': 'Bearer ' + data,
+                'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
             }
         }).then((response) => {
             if (response.status == 200) {

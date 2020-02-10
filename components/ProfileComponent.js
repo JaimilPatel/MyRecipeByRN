@@ -3,6 +3,7 @@ import { View, Image, StyleSheet, Text, FlatList, Dimensions, RefreshControl, Im
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { TouchableWithoutFeedback, ScrollView } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-community/async-storage'
+import DataLoadingComponent from './DataLoadingComponent'
 
 const styles = StyleSheet.create({
 
@@ -148,7 +149,8 @@ export class ProfileComponent extends Component {
       dataFavouriteFeedSource: [],
       getFirstName: '',
       getLastName: '',
-      getAuthorizedToken: ''
+      getAuthorizedToken: '',
+      isRefreshing: true,
     }
   }
 
@@ -188,7 +190,8 @@ export class ProfileComponent extends Component {
       this.setState({
         dataFavouriteFeedSource: responseJson,
         getFirstName: firstName,
-        getLastName: lastName
+        getLastName: lastName,
+        isRefreshing : false
       });
 
     }).catch((error) => {
@@ -196,6 +199,13 @@ export class ProfileComponent extends Component {
     });
   }
   render() {
+    if (this.state.isRefreshing) {
+      return (
+        <View style={{ flex: 1, paddingTop: 20, justifyContent: "center" }}>
+          <DataLoadingComponent isLoading={this.state.isLoading} style={{ flex: 1, paddingTop: 20, justifyContent: "center" }} />
+        </View>
+      );
+    }
     return (
       <SafeAreaView style={{ backgroundColor: '#F9DAC6' }}>
         <ScrollView>
@@ -208,7 +218,7 @@ export class ProfileComponent extends Component {
               />
             </View>
             <View style={{ height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={[styles.titleTextColor, { marginTop: 5 }]}>{this.state.getFirstName + ' ' + this.state.getLastName}</Text>
+              <Text style={[styles.titleTextColor, { marginTop: 5, fontWeight  :"bold" }]}>{this.state.getFirstName + ' ' + this.state.getLastName}</Text>
             </View>
             <View style={{ flexDirection: 'row', marginStart: 10 }}>
               <Image

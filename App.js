@@ -13,6 +13,7 @@ import { RecipeDetailsComponent } from './components/RecipeDetailsComponent';
  },{
   initialRouteName : 'RecipeDetail',
   headerMode: 'none',
+  mode : 'card',
   navigationOptions: {
       headerVisible: false,
   }

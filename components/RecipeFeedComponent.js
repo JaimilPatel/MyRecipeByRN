@@ -167,7 +167,6 @@ export class RecipeFeedComponent extends Component {
   onRecipeClick(item) {
     this.props.navigation.navigate('RecipeDetail', {
       id: item.recipeId,
-      data : data
     });
   }
 
@@ -248,6 +247,31 @@ export class RecipeFeedComponent extends Component {
         dataFavouriteSource: responseJson,
         isRefreshing: false
       });
+    }).catch((error) => {
+      console.log(error)
+    });
+  }
+
+  deleteRecipe(item){
+    fetch('http://35.160.197.175:3006/api/v1/recipe/'+item.recipeId,
+      {
+        method: 'DELETE',
+        headers: {
+          'Authorization': 'Bearer ' + data
+        },
+      }
+    ).then((response) => {
+      if (response.status == 200) {
+        return response.json()
+      } else {
+      }
+    }).then((responseJson) => {
+      this.setState({
+        isLoading: false,
+        dataFeedSource: responseJson,
+        isRefreshing: false
+      });
+      this.getFeedList()
     }).catch((error) => {
       console.log(error)
     });
@@ -354,7 +378,7 @@ export class RecipeFeedComponent extends Component {
 
       <SafeAreaView>
 
-        <ScrollView>
+        <ScrollView refreshControl = { <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>}>
           <View style={{ backgroundColor: '#F9DAC6' }}>
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/meals.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
@@ -362,17 +386,9 @@ export class RecipeFeedComponent extends Component {
             </View>
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>Everyday meals curated for you</Text>
-              <View style={styles.combineRowContainer}>
-                <Text style={{ fontSize: 17, fontWeight: '900', marginTop: 4 }}>See all</Text>
-                <Image source={require('../images/next.png')} style={{ width: 20, height: 20, marginStart: 5, marginEnd: 10, marginTop: 7 }}></Image>
-
-              </View>
             </View>
 
             <FlatList
-              refreshControl={
-                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
-              }
               horizontal={true}
               data={this.state.dataFavouriteSource}
               renderItem={({ item }) => {
@@ -399,6 +415,7 @@ export class RecipeFeedComponent extends Component {
                 </View>
               }}
               keyExtractor={item => item.recipeId}
+              extraData = {this.state}
             />
 
           </View>
@@ -412,9 +429,6 @@ export class RecipeFeedComponent extends Component {
 
             <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>First we eat, then we do everything else.</Text>
             <FlatList style={{ marginTop: 10 }}
-              refreshControl={
-                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
-              }
               data={this.state.dataFeedSource}
               renderItem={({ item }) => {
                 return (
@@ -460,6 +474,7 @@ export class RecipeFeedComponent extends Component {
                 );
               }}
               keyExtractor={item => item.recipeId}
+              extraData = {this.state}
               ListHeaderComponent={this.renderHeader}
             />
           </View>
