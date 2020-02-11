@@ -2,11 +2,13 @@ import {SignInComponent} from './components/SignInComponent';
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
 import { SplashComponent } from './components/SplashComponent';
-import { RecipeFeedComponent } from './components/RecipeFeedComponent';
 import { AddNewRecipeComponent } from './components/AddNewRecipeComponent';
 import { ProfileComponent } from './components/ProfileComponent';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import { RecipeDetailsComponent } from './components/RecipeDetailsComponent';
+import { Provider } from 'react-redux';
+import store from './store/store';
+import RecipeFeedComponent from './components/RecipeFeedComponent';
 
  const internalNavigator = createStackNavigator({
    RecipeDetail : {screen : RecipeDetailsComponent}
@@ -59,17 +61,20 @@ const authNavigator  = createSwitchNavigator({
  })
 
 const rootNavigator = createStackNavigator({
-  auth : authNavigator,
   home : homeNavigator , 
-  internal : internalNavigator
 },{
-  initialRouteName : 'auth',
+  initialRouteName : 'home',
   headerMode: 'none',
   navigationOptions: {
       headerVisible: false,
   }
 })
 
+const AppContainer = createAppContainer(rootNavigator);
 
-const App = createAppContainer(rootNavigator);
-export default App;
+export default function App(){
+  return <Provider store = {store}>
+    <AppContainer/>
+  </Provider>
+}
+

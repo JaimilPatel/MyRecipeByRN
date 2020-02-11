@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { ImageBackground } from 'react-native'
 import AsyncStorage from '@react-native-community/async-storage'
 
-export class SplashComponent extends Component {
+class SplashComponent extends Component {
   static navigationOptions = {
     headerShown: false
   };

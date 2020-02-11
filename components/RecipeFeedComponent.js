@@ -3,6 +3,7 @@ import { View, FlatList, SafeAreaView, RefreshControl, ImageBackground, Touchabl
 import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SearchBar } from 'react-native-elements';
+import { connect } from 'react-redux';
 
 const placholder = require('../images/loaderfood.gif')
 
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
   }
 })
 
-export class RecipeFeedComponent extends Component {
+class RecipeFeedComponent extends Component {
   static navigationOptions = {
     headerShown: false,
     title: '',
@@ -178,7 +179,7 @@ export class RecipeFeedComponent extends Component {
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + data,
+            'Authorization': 'Bearer ' + this.props.token,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -207,7 +208,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + this.props.token,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -233,7 +234,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + data
+          'Authorization': 'Bearer ' + this.props.token
         },
       }
     ).then((response) => {
@@ -257,7 +258,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'DELETE',
         headers: {
-          'Authorization': 'Bearer ' + data
+          'Authorization': 'Bearer ' + this.props.token
         },
       }
     ).then((response) => {
@@ -283,7 +284,7 @@ export class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + data
+          'Authorization': 'Bearer ' + this.props.token
         },
       }
     ).then((response) => {
@@ -483,6 +484,13 @@ export class RecipeFeedComponent extends Component {
     );
   }
 }
+const mapStateToProps = (state) => {
+  return {
+      token: state.authReducer.token,
+  };
+};
+
+export default connect(mapStateToProps) (RecipeFeedComponent)
 
 
 

@@ -4,6 +4,8 @@ import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
 import AsyncStorage from '@react-native-community/async-storage'
+import { storeToken } from '../actions/authAction';
+import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
 
@@ -100,7 +102,21 @@ const styles = StyleSheet.create({
 
 })
 
-export class SignInComponent extends Component {
+const mapStateToProps = (state) => {
+  return {
+      token: state.authReducer.token,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        storeToken: (token) => {
+            dispatch(storeToken(token));
+        }
+    };
+};
+
+class SignInComponent extends Component {
 
   static navigationOptions = {
     headerShown: false
@@ -143,6 +159,7 @@ export class SignInComponent extends Component {
           this.setState({
             authToken: token
           });
+          storeToken(token)
           this.storeData(responseJson)
           this.props.navigation.navigate('home', {
             data: this.state.authToken
@@ -220,3 +237,4 @@ export class SignInComponent extends Component {
 
   }
 }
+export default connect(mapStateToProps, mapDispatchToProps)(SignInComponent);
