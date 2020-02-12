@@ -75,24 +75,6 @@ const rootNavigator = createStackNavigator({
 
 const AppContainer = createAppContainer(rootNavigator)
 
-// const AppContainer = createAppContainer(
-
-//   createBottomTabNavigator(
-//     {
-//       SignIn: SignInComponent,
-//       RecipeFeed: RecipeFeedComponent
-//     },
-//     {
-//       tabBarPosition: 'bottom'
-//       // initialRouteName: 'FAQ'
-//       // mode: 'card',
-//       // headerMode: 'none'
-//     }
-//   )
-// )
-
-// const AppContainer = createAppContainer(rootNavigator);
-
 export default function App(){
   return <Provider store = {store}>
     <AppContainer/>

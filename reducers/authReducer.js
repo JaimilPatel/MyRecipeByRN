@@ -1,7 +1,6 @@
 const authReducer = (state = {
     token: ''
 }, action) => {
-    console.log("Called userReducer");
 
     switch (action.type) {
         case 'STORE_TOKEN':

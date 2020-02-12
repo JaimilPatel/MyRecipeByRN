@@ -112,7 +112,7 @@ class SignInComponent extends Component {
 
   constructor() {
     super()
-    this.state = { email: '', password: '', authToken: null }
+    this.state = { email: 'jm1@example.com', password: 'jay@123', authToken: null }
   }
 
   onSignIn(email, password) {

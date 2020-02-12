@@ -4,6 +4,7 @@ import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
+import { storeFeed } from '../actions/feedAction';
 
 const placholder = require('../images/loaderfood.gif')
 
@@ -173,7 +174,7 @@ class RecipeFeedComponent extends Component {
 
   addToFavourite(item) {
 
-    const data = this.props.navigation.getParam('data', '');
+    //const data = this.props.navigation.getParam('data', '');
     if (item.inCookingList == 0) {
       fetch('http://35.160.197.175:3006/api/v1/recipe/add-to-cooking-list',
         {
@@ -203,7 +204,7 @@ class RecipeFeedComponent extends Component {
   }
 
   removeFromFavourite(item) {
-    const data = this.props.navigation.getParam('data', '');
+    // const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list',
       {
         method: 'POST',
@@ -229,7 +230,7 @@ class RecipeFeedComponent extends Component {
   }
 
   getFavouriteRecipeList() {
-    const data = this.props.navigation.getParam('data', '');
+    // const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/cooking-list',
       {
         method: 'GET',
@@ -279,7 +280,7 @@ class RecipeFeedComponent extends Component {
   }
 
   getFeedList() {
-    const data = this.props.navigation.getParam('data', '');
+    // const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/feeds',
       {
         method: 'GET',
@@ -299,6 +300,7 @@ class RecipeFeedComponent extends Component {
         isRefreshing: false
       });
       this.arrayHolder = responseJson
+      this.props.storeFeed(this.state.dataFeedSource)
     }).catch((error) => {
       console.log(error)
     });
@@ -430,7 +432,7 @@ class RecipeFeedComponent extends Component {
 
             <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>First we eat, then we do everything else.</Text>
             <FlatList style={{ marginTop: 10 }}
-              data={this.state.dataFeedSource}
+              data={this.props.feed}
               renderItem={({ item }) => {
                 return (
                   <View style={[styles.imageViewController, { borderColor: 'silver', borderWidth: 1, borderBottomWidth: 1 }]}>
@@ -487,10 +489,20 @@ class RecipeFeedComponent extends Component {
 
 const mapStateToProps = (state) => {
   alert(state.authReducer.token)
-  return { token: state.authReducer.token }
+ // alert(state.authReducer.token)
+  return { feed : state.feedReducer.feed, token: state.authReducer.token}
 }
 
-export default connect(mapStateToProps)(RecipeFeedComponent)
+const mapDispatchToProps = (dispatch) => {
+  return {
+      storeFeed:(feed)=>{
+          dispatch(storeFeed(feed))
+      }
+  }
+}
+
+
+export default connect(mapStateToProps,mapDispatchToProps)(RecipeFeedComponent)
 
 
 
