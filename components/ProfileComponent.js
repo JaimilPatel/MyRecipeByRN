@@ -177,7 +177,7 @@ class ProfileComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + data
+          'Authorization': this.props.token
         },
       }
     ).then((response) => {
@@ -332,8 +332,6 @@ class ProfileComponent extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  alert(state.authReducer.token)
- // alert(state.authReducer.token)
   return { feed : state.feedReducer.feed, token: state.authReducer.token}
 }
 export default connect(mapStateToProps)(ProfileComponent)

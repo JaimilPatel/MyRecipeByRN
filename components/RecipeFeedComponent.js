@@ -147,7 +147,8 @@ class RecipeFeedComponent extends Component {
       dataFavouriteSource: [],
       isRefreshing: true,
       authToken: '',
-      value: ''
+      value: '',
+      tokenFromRedux : ''
     }
     this.arrayHolder = [];
   }
@@ -160,7 +161,7 @@ class RecipeFeedComponent extends Component {
 
   }
 
-  onShare
+ 
 
   onLikeClick(item) {
     this.addToFavourite(item)
@@ -301,6 +302,11 @@ class RecipeFeedComponent extends Component {
       });
       this.arrayHolder = responseJson
       this.props.storeFeed(this.state.dataFeedSource)
+      let i =0
+      if(i==0){
+      this.getFeedList()
+      i++
+    }
     }).catch((error) => {
       console.log(error)
     });
@@ -361,7 +367,7 @@ class RecipeFeedComponent extends Component {
   };
 
   componentDidMount() {
-
+    console.log('componentDidMount : '+this.props.token)
     this.setState({
       isLoading: true,
     });
@@ -393,7 +399,7 @@ class RecipeFeedComponent extends Component {
 
             <FlatList
               horizontal={true}
-              data={this.state.dataFavouriteSource}
+              data={this.props.feed}
               renderItem={({ item }) => {
                 return <View style={styles.horizontalImageViewContainer}>
                   <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
@@ -418,7 +424,7 @@ class RecipeFeedComponent extends Component {
                 </View>
               }}
               keyExtractor={item => item.recipeId}
-              extraData = {this.state}
+              extraData = {this.props.feed}
             />
 
           </View>
@@ -477,7 +483,7 @@ class RecipeFeedComponent extends Component {
                 );
               }}
               keyExtractor={item => item.recipeId}
-              extraData = {this.state}
+              extraData = {this.props.feed}
               ListHeaderComponent={this.renderHeader}
             />
           </View>
@@ -486,10 +492,11 @@ class RecipeFeedComponent extends Component {
     );
   }
 }
-
+            let i =0                  
 const mapStateToProps = (state) => {
-  alert(state.authReducer.token)
- // alert(state.authReducer.token)
+
+  console.log("mapStateToProps TOKENNNNNNNNNN "+state.authReducer.token+" times"+i)
+  i++
   return { feed : state.feedReducer.feed, token: state.authReducer.token}
 }
 
