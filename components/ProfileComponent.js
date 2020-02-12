@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context'
 import { TouchableWithoutFeedback, ScrollView } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-community/async-storage'
 import DataLoadingComponent from './DataLoadingComponent'
+import { connect } from 'react-redux';
 
 const styles = StyleSheet.create({
 
@@ -123,7 +124,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   }
 })
-export default class ProfileComponent extends Component {
+class ProfileComponent extends Component {
 
   static navigationOptions = {
     headerShown: false,
@@ -232,7 +233,7 @@ export default class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.state.dataFavouriteFeedSource}
+              data={this.props.feed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Easy') {
                   return <View style={styles.horizontalImageViewContainer}>
@@ -267,7 +268,7 @@ export default class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.state.dataFavouriteFeedSource}
+              data={this.props.feed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Medium') {
                   return <View style={styles.horizontalImageViewContainer}>
@@ -302,7 +303,7 @@ export default class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.state.dataFavouriteFeedSource}
+              data={this.props.feed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Complex') {
                   return <View style={styles.horizontalImageViewContainer}>
@@ -330,3 +331,9 @@ export default class ProfileComponent extends Component {
     )
   }
 }
+const mapStateToProps = (state) => {
+  alert(state.authReducer.token)
+ // alert(state.authReducer.token)
+  return { feed : state.feedReducer.feed, token: state.authReducer.token}
+}
+export default connect(mapStateToProps)(ProfileComponent)
