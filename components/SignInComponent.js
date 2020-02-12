@@ -102,19 +102,6 @@ const styles = StyleSheet.create({
 
 })
 
-const mapStateToProps = (state) => {
-  return {
-      token: state.authReducer.token,
-  };
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        storeToken: (token) => {
-            dispatch(storeToken(token));
-        }
-    };
-};
 
 class SignInComponent extends Component {
 
@@ -159,11 +146,11 @@ class SignInComponent extends Component {
           this.setState({
             authToken: token
           });
-          storeToken(token)
           this.storeData(responseJson)
           this.props.navigation.navigate('home', {
             data: this.state.authToken
           });
+          this.props.storeToken(this.state.authToken)
           return responseJson
         }).catch((error) => {
           console.log(error)
@@ -237,4 +224,16 @@ class SignInComponent extends Component {
 
   }
 }
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+      storeToken:(token)=>{
+          dispatch(storeToken(token))
+      }
+  }
+}
+const mapStateToProps = (state) => {
+  return { token: state.token }
+}
+
 export default connect(mapStateToProps, mapDispatchToProps)(SignInComponent);

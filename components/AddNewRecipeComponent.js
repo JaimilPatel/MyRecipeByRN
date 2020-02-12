@@ -151,7 +151,7 @@ images: {
 },
 })
 
-export class AddNewRecipeComponent extends Component {
+export default class AddNewRecipeComponent extends Component {
 
   static navigationOptions = {
     headerShown: false,

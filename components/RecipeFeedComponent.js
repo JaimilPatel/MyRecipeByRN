@@ -179,7 +179,7 @@ class RecipeFeedComponent extends Component {
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer ' + this.props.token,
+            'Authorization': this.props.token,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -208,7 +208,7 @@ class RecipeFeedComponent extends Component {
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer ' + this.props.token,
+          'Authorization':this.props.token,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -234,7 +234,7 @@ class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + this.props.token
+          'Authorization': this.props.token
         },
       }
     ).then((response) => {
@@ -258,7 +258,7 @@ class RecipeFeedComponent extends Component {
       {
         method: 'DELETE',
         headers: {
-          'Authorization': 'Bearer ' + this.props.token
+          'Authorization': this.props.token
         },
       }
     ).then((response) => {
@@ -284,7 +284,7 @@ class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer ' + this.props.token
+          'Authorization': this.props.token
         },
       }
     ).then((response) => {
@@ -484,13 +484,13 @@ class RecipeFeedComponent extends Component {
     );
   }
 }
-const mapStateToProps = (state) => {
-  return {
-      token: state.authReducer.token,
-  };
-};
 
-export default connect(mapStateToProps) (RecipeFeedComponent)
+const mapStateToProps = (state) => {
+  alert(state.authReducer.token)
+  return { token: state.authReducer.token }
+}
+
+export default connect(mapStateToProps)(RecipeFeedComponent)
 
 
 

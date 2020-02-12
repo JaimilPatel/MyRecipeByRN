@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     }
 })
 
-export class RecipeDetailsComponent extends Component {
+export default class RecipeDetailsComponent extends Component {
 
     constructor() {
         super()

@@ -1,14 +1,16 @@
-import {SignInComponent} from './components/SignInComponent';
-import { createAppContainer, createSwitchNavigator } from 'react-navigation';
-import { createStackNavigator } from 'react-navigation-stack';
-import { SplashComponent } from './components/SplashComponent';
-import { AddNewRecipeComponent } from './components/AddNewRecipeComponent';
-import { ProfileComponent } from './components/ProfileComponent';
-import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
-import { RecipeDetailsComponent } from './components/RecipeDetailsComponent';
-import { Provider } from 'react-redux';
+import React, { Component } from 'react';
+import { createAppContainer, createSwitchNavigator} from 'react-navigation';
 import store from './store/store';
+import { createBottomTabNavigator } from 'react-navigation-tabs';
+import { Provider } from 'react-redux';
+import SignInComponent from './components/SignInComponent';
 import RecipeFeedComponent from './components/RecipeFeedComponent';
+import RecipeDetailsComponent from './components/RecipeDetailsComponent';
+import AddNewRecipeComponent from './components/AddNewRecipeComponent';
+import ProfileComponent from './components/ProfileComponent';
+import { createStackNavigator } from 'react-navigation-stack';
+import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
+import SplashComponent from './components/SplashComponent';
 
  const internalNavigator = createStackNavigator({
    RecipeDetail : {screen : RecipeDetailsComponent}
@@ -61,16 +63,35 @@ const authNavigator  = createSwitchNavigator({
  })
 
 const rootNavigator = createStackNavigator({
+  auth : authNavigator,
   home : homeNavigator , 
 },{
-  initialRouteName : 'home',
+  initialRouteName : 'auth',
   headerMode: 'none',
   navigationOptions: {
       headerVisible: false,
   }
 })
 
-const AppContainer = createAppContainer(rootNavigator);
+const AppContainer = createAppContainer(rootNavigator)
+
+// const AppContainer = createAppContainer(
+
+//   createBottomTabNavigator(
+//     {
+//       SignIn: SignInComponent,
+//       RecipeFeed: RecipeFeedComponent
+//     },
+//     {
+//       tabBarPosition: 'bottom'
+//       // initialRouteName: 'FAQ'
+//       // mode: 'card',
+//       // headerMode: 'none'
+//     }
+//   )
+// )
+
+// const AppContainer = createAppContainer(rootNavigator);
 
 export default function App(){
   return <Provider store = {store}>

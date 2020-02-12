@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     alignItems: "center"
   }
 })
-export class ProfileComponent extends Component {
+export default class ProfileComponent extends Component {
 
   static navigationOptions = {
     headerShown: false,
