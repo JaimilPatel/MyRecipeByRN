@@ -1,16 +1,34 @@
 import React, { Component } from 'react'
-import { View, Dimensions, StyleSheet, Image, Text, TouchableOpacity, Share } from 'react-native'
-import { ScrollView, TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { View, Dimensions, StyleSheet, Image, Text, TouchableOpacity, Share, TouchableWithoutFeedbackBase } from 'react-native'
+import { ScrollView, TouchableWithoutFeedback, FlatList } from 'react-native-gesture-handler';
 import DataLoadingComponent from './DataLoadingComponent';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview'
 import AsyncStorage from '@react-native-community/async-storage'
+import {
+    OutlinedTextField,
+} from 'react-native-material-textfield';
+import { TextInput } from 'react-native-paper';
 
 const styles = StyleSheet.create({
+
+    outLinedTextField: {
+        paddingHorizontal: 10
+    },
+
 
     touchableButton: {
         alignItems: 'center',
         backgroundColor: 'black',
+        width: 310,
+        justifyContent: "center",
+        borderRadius: 10,
+        height: 45,
+        marginTop: 10,
+    },
+    touchableButtons: {
+        alignItems: 'center',
+        backgroundColor: '#DC7633',
         width: 310,
         justifyContent: "center",
         borderRadius: 10,
@@ -38,6 +56,11 @@ const styles = StyleSheet.create({
         width: Dimensions.get('window').width,
         height: 50,
         padding: 5,
+    },
+    commentContainer: {
+        justifyContent: "space-around",
+        backgroundColor: 'white',
+        alignItems: "stretch",
     },
 
     titleTextColor: {
@@ -98,7 +121,19 @@ export default class RecipeDetailsComponent extends Component {
             isLoading: false,
             isRefreshing: true,
             TextInputValueHolder: '',
-            getToken: ''
+            getToken: '',
+            getComments: [],
+            addedComment: '',
+            commentArray: [],
+            commentIdArray: [],
+            commentTimeArray: [],
+            commentWriterArray: [],
+            viewVisible: false,
+            itemPressed: null,
+            innerViewVisible: false,
+            updatedComment: '',
+            currentTime: new Date().toLocaleString().substring(11, 13),
+            finalDiffTime: ''
         }
     }
 
@@ -137,6 +172,134 @@ export default class RecipeDetailsComponent extends Component {
             {
                 message: this.state.TextInputValueHolder.toString()
             }).then(result => console.log(result)).catch(errorMsg => console.log(errorMsg));
+    }
+
+    addComment() {
+        this.textComment.clear()
+        const recipeId = this.props.navigation.getParam('id', '');
+        const data = this.props.navigation.getParam('data', '');
+        console.log("recipeId : " + data)
+        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments', {
+
+            method: 'POST',
+            headers: {
+                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'comment': this.state.addedComment,
+            })
+        }).then((response) => {
+            if (response.status == 200) {
+                return response.json()
+            } else {
+            }
+        }).then((responseJson) => {
+            const { msg } = responseJson
+            console.log(msg)
+            this.setState({
+                addedComment: ''
+            })
+            this.getComment()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
+    getComment() {
+        const recipeId = this.props.navigation.getParam('id', '');
+        const data = this.props.navigation.getParam('data', '');
+        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments', {
+
+            method: 'GET',
+            headers: {
+                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => {
+            if (response.status == 200) {
+                return response.json()
+            } else {
+            }
+        }).then((responseJson) => {
+            this.setState({
+                getComments: responseJson
+            })
+            var getCommentArray = []
+            var getCommentIdArray = []
+            var getCommentTimeArray = []
+            var getCommentWriterArray = []
+            for (var commentData in this.state.getComments) {
+                getCommentArray.push(this.state.getComments[commentData].comment)
+                getCommentIdArray.push(this.state.getComments[commentData].id)
+                getCommentTimeArray.push(this.state.getComments[commentData].createdAt)
+                getCommentWriterArray.push(this.state.getComments[commentData].firstName)
+            }
+            this.setState({
+                commentArray: getCommentArray,
+                commentIdArray: getCommentIdArray,
+                commentTimeArray: getCommentTimeArray,
+                commentWriterArray: getCommentWriterArray
+            })
+
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
+    editComment(commentId) {
+        this.setState({ innerViewVisible: false })
+        alert(this.state.updatedComment)
+        const recipeId = this.props.navigation.getParam('id', '');
+        const data = this.props.navigation.getParam('data', '');
+        console.log(recipeId + " " + commentId + " " + this.state.updatedComment)
+        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments/' + commentId, {
+
+            method: 'PUT',
+            headers: {
+                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                'comment': this.state.updatedComment,
+            })
+        }).then((response) => {
+            if (response.status == 200) {
+                alert("All Good")
+
+                return response.json()
+            } else {
+
+            }
+        }).then((responseJson) => {
+            this.getComment()
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
+
+    deleteComment(commentId) {
+        const recipeId = this.props.navigation.getParam('id', '');
+        const data = this.props.navigation.getParam('data', '');
+        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments/' + commentId, {
+
+            method: 'DELETE',
+            headers: {
+                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+                'Content-Type': 'application/json'
+            },
+        }).then((response) => {
+            if (response.status == 200) {
+                return response.json()
+            } else {
+
+            }
+        }).then((responseJson) => {
+
+            this.getComment()
+        }).catch((error) => {
+            console.log(error)
+        })
     }
 
     getRecipeDetails() {
@@ -197,7 +360,70 @@ export default class RecipeDetailsComponent extends Component {
             isLoading: true,
         });
         this.getRecipeDetails()
+        this.getComment()
     }
+    typeSelected(value) {
+        this.setState({
+            itemPressed: value,
+            innerViewVisible: true
+        });
+
+    }
+
+    renderTouchableHighlight(comments, commentIds, commenttime, commentwriter, index) {
+        const updateText = this.state.commentArray[index]
+        let diffTime
+        console.log("CommentTime " + commenttime[index].toString().substring(11, 13))
+        console.log("CurrentTime " + this.state.currentTime)
+        if (commenttime[index].toString().substring(11, 13) > this.state.currentTime) {
+            diffTime = commenttime[index].toString().substring(11, 13) - this.state.currentTime
+        } else {
+            diffTime = -(commenttime[index].toString().substring(11, 13) - this.state.currentTime)
+        }
+        return (
+            <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50, justifyContent: 'space-around', alignItems: "center" }}>
+
+                <TouchableOpacity onPress={() => this.typeSelected(commentIds[index])}>
+                    {(this.state.itemPressed === commentIds[index] && this.state.innerViewVisible === true) ?
+
+                        <View style={{ flexDirection: 'row' }}>
+                            <TextInput
+                                style={{ width: 300, height: 20, backgroundColor: 'white', textColor: 'black' }}
+                                keyboardType='default'
+                                value={this.state.updatedComment}
+                                onChangeText={(updatedComment) => this.setState({ updatedComment })}
+                            />
+                            <TouchableOpacity style={[styles.touchableButtons, {
+                                width: 30, height: 30, marginStart: 5
+                            }]} onPress={() => this.editComment(commentIds[index])}>
+                                <Text style={{ color: 'black', fontSize: 20 }}>+</Text>
+                            </TouchableOpacity>
+                        </View>
+                        :
+                        <View style={styles.commentContainer}>
+                            <View style={{ flexDirection: 'row' }}>
+                                <View style={styles.circle}>
+                                    <Text>{index}</Text>
+                                </View>
+                                <View style={{ flexDirection: 'column' }}>
+                                    <Text style={[styles.titleTextColor, { width: 300, }]}>{comments[index].toString()}</Text>
+                                    <Text style={[styles.titleTextColor, { width: 300, fontSize: 10 }]}>{diffTime} Hours ago by {commentwriter[index]}</Text>
+                                </View>
+                            </View>
+                        </View>
+                    }
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => this.deleteComment(commentIds[index])}>
+                    <Image source={require('../images/bin.png')} style={{ width: 25, height: 25, marginStart: 10 }}></Image>
+                </TouchableOpacity>
+
+            </View>
+        )
+    }
+
+
+
+
     render() {
         if (this.state.isRefreshing) {
             return (
@@ -243,6 +469,8 @@ export default class RecipeDetailsComponent extends Component {
 
             }
         }
+
+
 
 
         return (
@@ -316,8 +544,54 @@ export default class RecipeDetailsComponent extends Component {
                                 </TouchableOpacity>
                             </View>
                         </View>
+
                     </View>
                     {renderbottomView}
+                    <View style={styles.outLinedTextField}>
+                        <View style={{ flexDirection: 'row' }}>
+                            <View style={[styles.outLinedTextField, { marginTop: 10, flex: 1 }]}>
+                                <OutlinedTextField
+                                    label='Add Comment....'
+                                    keyboardType='default'
+                                    ref={input => { this.textComment = input }}
+                                    tintColor='#DC7633'
+                                    value={this.state.addedComment}
+                                    onChangeText={(addedComment) => this.setState({ addedComment })}
+                                />
+                            </View>
+                            <TouchableOpacity style={[styles.touchableButtons, {
+                                width: 50, height: 50, marginTop: 10,
+                            }]} onPress={() => this.addComment()}>
+                                <Text style={{ color: 'black', fontSize: 30 }}>+</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                    <View style={{ flex: 1 }}>
+                        <TouchableOpacity style={{
+                            alignSelf: 'stretch', backgroundColor: '#DC7633', height: 50
+                        }}>
+                            <Text style={{
+                                alignSelf: 'center',
+                                color: 'black',
+                                fontSize: 16,
+                                fontWeight: '600',
+                                paddingTop: 14,
+                                paddingBottom: 10
+                            }}>COMMENTS</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <FlatList
+                        style={{ marginTop: 5 }}
+                        data={this.state.commentArray}
+                        renderItem={({ item, index }) => {
+                            return <View key={index}>
+                                <View style={styles.topTitleContainer}>
+                                    {this.renderTouchableHighlight(this.state.commentArray, this.state.commentIdArray, this.state.commentTimeArray, this.state.commentWriterArray, index)}
+                                </View>
+                            </View>
+                        }}
+                        extraData={this.state}
+                    />
                 </ScrollView>
             </SafeAreaView>
         )

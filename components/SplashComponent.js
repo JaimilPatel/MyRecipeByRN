@@ -30,12 +30,12 @@ class SplashComponent extends Component {
     }, 4000);
   }
   load = () => {
-    // if (this.state.getAuthToken == '') {
+    if (this.state.getAuthToken == '') {
       this.props.navigation.navigate("SignIn");
-    // }
-    // else {
-    //   this.props.navigation.navigate("transfer", { data: this.state.getAuthToken })
-    // }
+    }
+    else {
+      this.props.navigation.navigate("RecipeFeed", { data: this.state.getAuthToken })
+    }
   };
   render() {
     return (

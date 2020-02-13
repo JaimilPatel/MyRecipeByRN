@@ -65,6 +65,7 @@ const authNavigator  = createSwitchNavigator({
 const rootNavigator = createStackNavigator({
   auth : authNavigator,
   home : homeNavigator , 
+  internal  :internalNavigator
 },{
   initialRouteName : 'auth',
   headerMode: 'none',

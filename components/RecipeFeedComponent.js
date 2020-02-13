@@ -10,6 +10,10 @@ const placholder = require('../images/loaderfood.gif')
 
 const styles = StyleSheet.create({
 
+  outLinedTextField: {
+    paddingHorizontal: 20,
+  },
+
   rowContainer: {
     flex: 1,
     flexDirection: 'row',
@@ -148,7 +152,7 @@ class RecipeFeedComponent extends Component {
       isRefreshing: true,
       authToken: '',
       value: '',
-      tokenFromRedux : ''
+      tokenFromRedux: ''
     }
     this.arrayHolder = [];
   }
@@ -161,27 +165,27 @@ class RecipeFeedComponent extends Component {
 
   }
 
- 
+
 
   onLikeClick(item) {
     this.addToFavourite(item)
   }
 
   onRecipeClick(item) {
-    this.props.navigation.navigate('RecipeDetail', {
+    this.props.navigation.navigate('internal', {
       id: item.recipeId,
     });
   }
 
   addToFavourite(item) {
 
-    //const data = this.props.navigation.getParam('data', '');
+    const data = this.props.navigation.getParam('data', '');
     if (item.inCookingList == 0) {
       fetch('http://35.160.197.175:3006/api/v1/recipe/add-to-cooking-list',
         {
           method: 'POST',
           headers: {
-            'Authorization': this.props.token,
+            'Authorization': 'Bearer '+data,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -205,12 +209,12 @@ class RecipeFeedComponent extends Component {
   }
 
   removeFromFavourite(item) {
-    // const data = this.props.navigation.getParam('data', '');
+     const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list',
       {
         method: 'POST',
         headers: {
-          'Authorization':this.props.token,
+          'Authorization': 'Bearer '+data,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -231,12 +235,12 @@ class RecipeFeedComponent extends Component {
   }
 
   getFavouriteRecipeList() {
-    // const data = this.props.navigation.getParam('data', '');
+     const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/cooking-list',
       {
         method: 'GET',
         headers: {
-          'Authorization': this.props.token
+          'Authorization': 'Bearer '+data,
         },
       }
     ).then((response) => {
@@ -255,12 +259,13 @@ class RecipeFeedComponent extends Component {
     });
   }
 
-  deleteRecipe(item){
-    fetch('http://35.160.197.175:3006/api/v1/recipe/'+item.recipeId,
+  deleteRecipe(item) {
+    const data = this.props.navigation.getParam('data', '');
+    fetch('http://35.160.197.175:3006/api/v1/recipe/' + item.recipeId,
       {
         method: 'DELETE',
         headers: {
-          'Authorization': this.props.token
+          'Authorization': 'Bearer '+data,
         },
       }
     ).then((response) => {
@@ -281,12 +286,12 @@ class RecipeFeedComponent extends Component {
   }
 
   getFeedList() {
-    // const data = this.props.navigation.getParam('data', '');
+    const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/feeds',
       {
         method: 'GET',
         headers: {
-          'Authorization': this.props.token
+          'Authorization': 'Bearer '+data,
         },
       }
     ).then((response) => {
@@ -302,11 +307,6 @@ class RecipeFeedComponent extends Component {
       });
       this.arrayHolder = responseJson
       this.props.storeFeed(this.state.dataFeedSource)
-      let i =0
-      if(i==0){
-      this.getFeedList()
-      i++
-    }
     }).catch((error) => {
       console.log(error)
     });
@@ -367,7 +367,7 @@ class RecipeFeedComponent extends Component {
   };
 
   componentDidMount() {
-    console.log('componentDidMount : '+this.props.token)
+    console.log('componentDidMount : ' + this.props.token)
     this.setState({
       isLoading: true,
     });
@@ -387,7 +387,7 @@ class RecipeFeedComponent extends Component {
 
       <SafeAreaView>
 
-        <ScrollView refreshControl = { <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>}>
+        <ScrollView refreshControl={<RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>}>
           <View style={{ backgroundColor: '#F9DAC6' }}>
             <View style={styles.combineRowContainer}>
               <Image source={require('../images/meals.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
@@ -424,7 +424,7 @@ class RecipeFeedComponent extends Component {
                 </View>
               }}
               keyExtractor={item => item.recipeId}
-              extraData = {this.props.feed}
+              extraData={this.props.feed}
             />
 
           </View>
@@ -479,11 +479,13 @@ class RecipeFeedComponent extends Component {
                         </View>
                       </ImageBackground>
                     </TouchableWithoutFeedback>
-                  </View>
+                   
+                   
+                 </View>
                 );
               }}
               keyExtractor={item => item.recipeId}
-              extraData = {this.props.feed}
+              extraData={this.props.feed}
               ListHeaderComponent={this.renderHeader}
             />
           </View>
@@ -492,24 +494,21 @@ class RecipeFeedComponent extends Component {
     );
   }
 }
-            let i =0                  
+let i = 0
 const mapStateToProps = (state) => {
-
-  console.log("mapStateToProps TOKENNNNNNNNNN "+state.authReducer.token+" times"+i)
-  i++
-  return { feed : state.feedReducer.feed, token: state.authReducer.token}
+  return { feed: state.feedReducer.feed, token: state.authReducer.token }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
-      storeFeed:(feed)=>{
-          dispatch(storeFeed(feed))
-      }
+    storeFeed: (feed) => {
+      dispatch(storeFeed(feed))
+    }
   }
 }
 
 
-export default connect(mapStateToProps,mapDispatchToProps)(RecipeFeedComponent)
+export default connect(mapStateToProps, mapDispatchToProps)(RecipeFeedComponent)
 
 
 

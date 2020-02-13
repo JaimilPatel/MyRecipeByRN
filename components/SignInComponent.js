@@ -150,7 +150,6 @@ class SignInComponent extends Component {
           this.props.navigation.navigate('home', {
             data: this.state.authToken
           });
-          this.props.storeToken(this.state.authToken)
           return responseJson
         }).catch((error) => {
           console.log(error)

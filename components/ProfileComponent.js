@@ -177,7 +177,7 @@ class ProfileComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': this.props.token
+          'Authorization': 'Bearer '+data
         },
       }
     ).then((response) => {
@@ -268,7 +268,7 @@ class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.props.feed}
+              data={this.state.dataFavouriteFeedSource}
               renderItem={({ item }) => {
                 if (item.complexity == 'Medium') {
                   return <View style={styles.horizontalImageViewContainer}>
