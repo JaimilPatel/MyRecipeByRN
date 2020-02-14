@@ -7,7 +7,7 @@ import {Dropdown } from 'react-native-material-dropdown'
 import TagInput from 'react-native-tags-input';
 import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-community/async-storage'
-import { storeIngredient } from '../actions/ingredientAction';
+import { storeIngredient, storeInstruction } from '../actions/combineDetailsAction';
 import { connect } from 'react-redux';
 
 const mainColor = '#3ca897';
@@ -229,6 +229,7 @@ class AddNewRecipeComponent extends Component {
     arr.push(newInstruction)
     this.setState({ instructionsArray: arr })
     this.textInstruction.clear()
+    this.props.storeInstruction(arr)
   }
 
   updateTagState = (state) => {
@@ -474,7 +475,7 @@ class AddNewRecipeComponent extends Component {
 
           <FlatList
           style = {{marginTop : 5}}
-          data={this.state.ingredientsArray}
+          data={this.props.ingredients}
           renderItem={({ item , index }) => {
             return  <View key={index}>
                         <View style={styles.topTitleContainer}>
@@ -482,7 +483,7 @@ class AddNewRecipeComponent extends Component {
                                 <View style={styles.circle}>
                                     <Text>{index}</Text>
                                 </View>
-                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.state.ingredientsArray[index].toString()}</Text>
+                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.props.ingredients[index].toString()}</Text>
                             </View>
                         </View>
                     </View>
@@ -506,7 +507,7 @@ class AddNewRecipeComponent extends Component {
           </View>
           <FlatList
           style = {{marginTop : 5}}
-          data={this.state.instructionsArray}
+          data={this.props.instructions}
           renderItem={({ item , index }) => {
             return  <View key={index}>
                         <View style={styles.topTitleContainer}>
@@ -514,7 +515,7 @@ class AddNewRecipeComponent extends Component {
                                 <View style={styles.circle}>
                                     <Text>{index}</Text>
                                 </View>
-                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.state.instructionsArray[index].toString()}</Text>
+                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.props.instructions[index].toString()}</Text>
                             </View>
                         </View>
                     </View>
@@ -552,13 +553,16 @@ class AddNewRecipeComponent extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { ingredients: state.ingredientReducer.ingredients}
+  return { ingredients: state.AddCombineDetails.ingredients , instructions : state.AddCombineDetails.instructions}
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     storeIngredient: (ingredients) => {
       dispatch(storeIngredient(ingredients))
+    },
+    storeInstruction : (instructions) => {
+      dispatch(storeInstruction(instructions))
     }
   }
 }

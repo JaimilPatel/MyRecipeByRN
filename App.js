@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { createAppContainer, createSwitchNavigator} from 'react-navigation';
 import store from './store/store';
-import { createBottomTabNavigator } from 'react-navigation-tabs';
 import { Provider } from 'react-redux';
 import SignInComponent from './components/SignInComponent';
 import RecipeFeedComponent from './components/RecipeFeedComponent';

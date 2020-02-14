@@ -4,7 +4,8 @@ import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { storeFeed } from '../actions/feedAction';
+import { storeFeed ,storeFavouriteFeed} from '../actions/combineFeedAction';
+import AsyncStorage from '@react-native-community/async-storage'
 
 const placholder = require('../images/loaderfood.gif')
 
@@ -152,10 +153,23 @@ class RecipeFeedComponent extends Component {
       isRefreshing: true,
       value: '',
       tokenFromRedux: '',
-      getAuthToken: ''
+      tokenData: ''
     }
     this.arrayHolder = [];
+    this.retrieveData()
   }
+
+  retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('authTokenStore');
+      if (value !== null) {
+        this.setState({ tokenData: value })
+        // alert("First "+this.state.tokenData)
+      }
+    } catch (error) {
+      alert(error)
+    }
+  };
 
   refreshList() {
     this.setState({ isRefreshing: true, isLoading: true }, function () { this.getFeedList(), this.getFavouriteRecipeList() });
@@ -176,16 +190,7 @@ class RecipeFeedComponent extends Component {
       id: item.recipeId,
     });
   }
-  retrieveData = async () => {
-    try {
-      const value = await AsyncStorage.getItem('authTokenStore');
-      if (value !== null) {
-        this.setState({ getAuthToken: value })
-      }
-    } catch (error) {
-      alert(error)
-    }
-  };
+
 
   addToFavourite(item) {
 
@@ -264,6 +269,7 @@ class RecipeFeedComponent extends Component {
         dataFavouriteSource: responseJson,
         isRefreshing: false
       });
+      this.props.storeFavouriteFeed(this.state.dataFavouriteSource)
     }).catch((error) => {
       console.log(error)
     });
@@ -296,6 +302,7 @@ class RecipeFeedComponent extends Component {
   }
 
   getFeedList() {
+    alert('In Api'+this.state.tokenData)
     const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/feeds',
       {
@@ -369,7 +376,7 @@ class RecipeFeedComponent extends Component {
     fetch('http://35.160.197.175:3006/api/v1/recipe/feeds?q='+text,{
       method : 'GET',
       headers : {
-       'Authorization' : 'Bearer '+data,
+       'Authorization' : 'Bearer '+this.state.tokenData,
       },
       URLSearchParams : {
         'q' : text
@@ -395,7 +402,7 @@ class RecipeFeedComponent extends Component {
   };
 
   componentDidMount() {
-    console.log('componentDidMount : ' + this.props.token)
+    this.retrieveData()
     this.setState({
       isLoading: true,
     });
@@ -424,10 +431,10 @@ class RecipeFeedComponent extends Component {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>Everyday meals curated for you</Text>
             </View>
-
+            {this.props.favouriteFeed!=null ?
             <FlatList
               horizontal={true}
-              data={this.state.dataFavouriteSource}
+              data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 return <View style={styles.horizontalImageViewContainer}>
                   <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
@@ -453,17 +460,23 @@ class RecipeFeedComponent extends Component {
               }}
               keyExtractor={item => item.recipeId}
             />
+            
 
+          :
+          <View style= {{justifyContent : 'center', alignItems : 'center' , backgroundColor : '#F9DAC6', height : 50}}>
+            <Text style ={{fontSize : 15,  marginTop: 10}}> No Favourite Recipe Found</Text>
           </View>
-
+        }
+        </View>
           <View style={{ backgroundColor: '#F9DAC6' }}>
 
             <View style={styles.combineRowContainer}>
-              <Image source={require('../images/foodorder.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 20 }}></Image>
+              <Image source={require('../images/foodorder.png')} style={{ width: 25, height: 25, marginStart: 10, marginTop: 10 }}></Image>
               <Text style={{ fontWeight: "bold", fontSize: 20, marginStart: 5, marginTop: 20 }}>Orders</Text>
             </View>
 
             <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>First we eat, then we do everything else.</Text>
+            {this.props.feed!=null ?
             <FlatList style={{ marginTop: 10 }}
               data={this.props.feed}
               renderItem={({ item }) => {
@@ -520,6 +533,11 @@ class RecipeFeedComponent extends Component {
               extraData={this.props.feed}
               ListHeaderComponent={this.renderHeader}
             />
+            :
+          <View style= {{justifyContent : 'center', alignItems : 'center' , backgroundColor : '#F9DAC6', height : Dimensions.get('window').height - 270}}>
+            <Text style ={{fontSize : 15,  marginTop: 10}}> No Recipe Found</Text>
+          </View>
+          }
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -528,13 +546,16 @@ class RecipeFeedComponent extends Component {
 }
 let i = 0
 const mapStateToProps = (state) => {
-  return { feed: state.feedReducer.feed, token: state.authReducer.token }
+  return { feed: state.GetCombineFeed.feed, favouriteFeed : state.GetCombineFeed.favouriteFeed}
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
     storeFeed: (feed) => {
       dispatch(storeFeed(feed))
+    },
+    storeFavouriteFeed : (favouriteFeed) =>{
+      dispatch(storeFavouriteFeed(favouriteFeed))
     }
   }
 }

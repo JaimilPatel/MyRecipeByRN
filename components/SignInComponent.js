@@ -7,6 +7,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { storeToken } from '../actions/authAction';
 import { connect } from 'react-redux';
 
+
 const styles = StyleSheet.create({
 
   inputs: {
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
 })
 
 
-class SignInComponent extends Component {
+export default class SignInComponent extends Component {
 
   static navigationOptions = {
     headerShown: false
@@ -147,7 +148,7 @@ class SignInComponent extends Component {
             authToken: token
           });
           this.storeData(responseJson)
-          this.props.navigation.navigate('home', {
+          this.props.navigation.navigate('RecipeFeed', {
             data: this.state.authToken
           });
           return responseJson
@@ -159,7 +160,9 @@ class SignInComponent extends Component {
   }
 
   storeData = async (responseJSON) => {
+   
     const { token } = responseJSON
+    alert(token)
     try {
       await AsyncStorage.setItem('authTokenStore', token)
     } catch (e) {
@@ -223,16 +226,3 @@ class SignInComponent extends Component {
 
   }
 }
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-      storeToken:(token)=>{
-          dispatch(storeToken(token))
-      }
-  }
-}
-const mapStateToProps = (state) => {
-  return { token: state.token }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SignInComponent);

@@ -9,6 +9,7 @@ import {
     OutlinedTextField,
 } from 'react-native-material-textfield';
 import { TextInput } from 'react-native-paper';
+import moment from 'moment-timezone';
 
 const styles = StyleSheet.create({
 
@@ -371,14 +372,13 @@ export default class RecipeDetailsComponent extends Component {
     }
 
     renderTouchableHighlight(comments, commentIds, commenttime, commentwriter, index) {
-        const updateText = this.state.commentArray[index]
         let diffTime
-        console.log("CommentTime " + commenttime[index].toString().substring(11, 13))
-        console.log("CurrentTime " + this.state.currentTime)
-        if (commenttime[index].toString().substring(11, 13) > this.state.currentTime) {
-            diffTime = commenttime[index].toString().substring(11, 13) - this.state.currentTime
+        var currentDate = new Date();
+        var utcData = currentDate.toUTCString();
+        if (commenttime[index].toString().substring(11, 13) > utcData.substring(17, 19)) {
+            diffTime = commenttime[index].toString().substring(11, 13) - utcData.substring(17, 19)
         } else {
-            diffTime = -(commenttime[index].toString().substring(11, 13) - this.state.currentTime)
+            diffTime = -(commenttime[index].toString().substring(11, 13) - utcData.substring(17, 19))
         }
         return (
             <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50, justifyContent: 'space-around', alignItems: "center" }}>

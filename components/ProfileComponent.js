@@ -177,7 +177,7 @@ class ProfileComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer '+'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
+          'Authorization': 'Bearer '+data
         },
       }
     ).then((response) => {
@@ -233,7 +233,7 @@ class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.props.feed}
+              data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Easy') {
                   return <View style={styles.horizontalImageViewContainer}>
@@ -268,7 +268,7 @@ class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.state.dataFavouriteFeedSource}
+              data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Medium') {
                   return <View style={styles.horizontalImageViewContainer}>
@@ -303,7 +303,7 @@ class ProfileComponent extends Component {
                 <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
               }
               horizontal={true}
-              data={this.props.feed}
+              data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Complex') {
                   return <View style={styles.horizontalImageViewContainer}>
@@ -332,6 +332,6 @@ class ProfileComponent extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  return { feed : state.feedReducer.feed, token: state.authReducer.token}
+  return { favouriteFeed : state.GetCombineFeed.favouriteFeed}
 }
 export default connect(mapStateToProps)(ProfileComponent)

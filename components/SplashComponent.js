@@ -34,7 +34,7 @@ class SplashComponent extends Component {
       this.props.navigation.navigate("SignIn");
     }
     else {
-      this.props.navigation.navigate("RecipeFeed", { data: this.state.getAuthToken })
+      this.props.navigation.navigate("transfer", { data: this.state.getAuthToken })
     }
   };
   render() {
