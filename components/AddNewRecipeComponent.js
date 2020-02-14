@@ -7,6 +7,8 @@ import {Dropdown } from 'react-native-material-dropdown'
 import TagInput from 'react-native-tags-input';
 import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-community/async-storage'
+import { storeIngredient } from '../actions/ingredientAction';
+import { connect } from 'react-redux';
 
 const mainColor = '#3ca897';
 
@@ -150,8 +152,7 @@ images: {
   marginStart : 50
 },
 })
-
-export default class AddNewRecipeComponent extends Component {
+class AddNewRecipeComponent extends Component {
 
   static navigationOptions = {
     headerShown: false,
@@ -219,6 +220,7 @@ export default class AddNewRecipeComponent extends Component {
     arr.push(newIngredient)
     this.setState({ ingredientsArray: arr })
     this.textIngredient.clear()
+    this.props.storeIngredient(arr)
   }
 
   addToInstructions = () => {
@@ -548,3 +550,17 @@ export default class AddNewRecipeComponent extends Component {
     )
   }
 }
+
+const mapStateToProps = (state) => {
+  return { ingredients: state.ingredientReducer.ingredients}
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    storeIngredient: (ingredients) => {
+      dispatch(storeIngredient(ingredients))
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AddNewRecipeComponent)

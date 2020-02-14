@@ -177,7 +177,7 @@ class ProfileComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer '+data
+          'Authorization': 'Bearer '+'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s'
         },
       }
     ).then((response) => {

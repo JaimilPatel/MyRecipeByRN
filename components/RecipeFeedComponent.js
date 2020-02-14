@@ -150,9 +150,9 @@ class RecipeFeedComponent extends Component {
       dataFeedSource: [],
       dataFavouriteSource: [],
       isRefreshing: true,
-      authToken: '',
       value: '',
-      tokenFromRedux: ''
+      tokenFromRedux: '',
+      getAuthToken: ''
     }
     this.arrayHolder = [];
   }
@@ -176,6 +176,16 @@ class RecipeFeedComponent extends Component {
       id: item.recipeId,
     });
   }
+  retrieveData = async () => {
+    try {
+      const value = await AsyncStorage.getItem('authTokenStore');
+      if (value !== null) {
+        this.setState({ getAuthToken: value })
+      }
+    } catch (error) {
+      alert(error)
+    }
+  };
 
   addToFavourite(item) {
 
@@ -185,7 +195,7 @@ class RecipeFeedComponent extends Component {
         {
           method: 'POST',
           headers: {
-            'Authorization': 'Bearer '+data,
+            'Authorization': 'Bearer ' + data,
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
@@ -209,12 +219,12 @@ class RecipeFeedComponent extends Component {
   }
 
   removeFromFavourite(item) {
-     const data = this.props.navigation.getParam('data', '');
+    const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list',
       {
         method: 'POST',
         headers: {
-          'Authorization': 'Bearer '+data,
+          'Authorization': 'Bearer ' + data,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
@@ -235,12 +245,12 @@ class RecipeFeedComponent extends Component {
   }
 
   getFavouriteRecipeList() {
-     const data = this.props.navigation.getParam('data', '');
+    const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/cooking-list',
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer '+data,
+          'Authorization': 'Bearer ' + data,
         },
       }
     ).then((response) => {
@@ -259,13 +269,13 @@ class RecipeFeedComponent extends Component {
     });
   }
 
-  deleteRecipe(item) {
+  onDeleteRecipe(item) {
     const data = this.props.navigation.getParam('data', '');
     fetch('http://35.160.197.175:3006/api/v1/recipe/' + item.recipeId,
       {
         method: 'DELETE',
         headers: {
-          'Authorization': 'Bearer '+data,
+          'Authorization': 'Bearer ' + data,
         },
       }
     ).then((response) => {
@@ -291,7 +301,7 @@ class RecipeFeedComponent extends Component {
       {
         method: 'GET',
         headers: {
-          'Authorization': 'Bearer '+data,
+          'Authorization': 'Bearer ' + data,
         },
       }
     ).then((response) => {
@@ -305,7 +315,7 @@ class RecipeFeedComponent extends Component {
         dataFeedSource: responseJson,
         isRefreshing: false
       });
-      this.arrayHolder = responseJson
+     // this.arrayHolder = responseJson
       this.props.storeFeed(this.state.dataFeedSource)
     }).catch((error) => {
       console.log(error)
@@ -355,15 +365,33 @@ class RecipeFeedComponent extends Component {
     this.setState({
       value: text,
     });
+    const data = this.props.navigation.getParam('data', '');
+    fetch('http://35.160.197.175:3006/api/v1/recipe/feeds?q='+text,{
+      method : 'GET',
+      headers : {
+       'Authorization' : 'Bearer '+data,
+      },
+      URLSearchParams : {
+        'q' : text
+      }
+    }).then((response) => {
+      console.log('success'+ response.status)
+      if(response.status == 200){
+        return response.json()
+      }else{
 
-    const newData = this.arrayHolder.filter(item => {
-      const itemData = `${item.name.toUpperCase()}`;
-      const textData = text.toUpperCase();
-      return itemData.indexOf(textData) > -1;
-    });
-    this.setState({
-      dataFeedSource: newData,
-    });
+      }
+    }).then((responseJson)=>{
+      this.arrayHolder = responseJson
+      this.setState({
+        dataFeedSource : this.arrayHolder
+      })
+      this.props.storeFeed(this.state.dataFeedSource)
+    }).catch((error) =>{
+      console.log(error)
+    })
+
+
   };
 
   componentDidMount() {
@@ -399,7 +427,7 @@ class RecipeFeedComponent extends Component {
 
             <FlatList
               horizontal={true}
-              data={this.props.feed}
+              data={this.state.dataFavouriteSource}
               renderItem={({ item }) => {
                 return <View style={styles.horizontalImageViewContainer}>
                   <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
@@ -424,7 +452,6 @@ class RecipeFeedComponent extends Component {
                 </View>
               }}
               keyExtractor={item => item.recipeId}
-              extraData={this.props.feed}
             />
 
           </View>
@@ -475,13 +502,18 @@ class RecipeFeedComponent extends Component {
                               <Image source={require('../images/clock.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
                               <Text style={styles.textStyle}>{item.preparationTime}</Text>
                             </View>
+                            <View style={styles.combineRowContainer}>
+                              <TouchableWithoutFeedback onPress={() => this.onDeleteRecipe(item)} >
+                                <Image source={require('../images/bin.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                              </TouchableWithoutFeedback>
+                            </View>
                           </View>
                         </View>
                       </ImageBackground>
                     </TouchableWithoutFeedback>
-                   
-                   
-                 </View>
+
+
+                  </View>
                 );
               }}
               keyExtractor={item => item.recipeId}
