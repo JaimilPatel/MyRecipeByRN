@@ -4,10 +4,11 @@ import DataLoadingComponent from './DataLoadingComponent';
 import { ScrollView } from 'react-native-gesture-handler';
 import { SearchBar } from 'react-native-elements';
 import { connect } from 'react-redux';
-import { storeFeed ,storeFavouriteFeed} from '../actions/combineFeedAction';
+import { storeFeed, storeFavouriteFeed } from '../actions/combineFeedAction';
 import AsyncStorage from '@react-native-community/async-storage'
+import * as AppConstant from '../constants/AppConstants'
+import * as ApiConstant from '../constants/ApiConstants'
 
-const placholder = require('../images/loaderfood.gif')
 
 const styles = StyleSheet.create({
 
@@ -159,18 +160,18 @@ class RecipeFeedComponent extends Component {
     this.retrieveData()
   }
 
+  //To get Token from AsyncStorage
   retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('authTokenStore');
+      const value = await AsyncStorage.getItem(AppConstant.AUTHTOKEN);
       if (value !== null) {
         this.setState({ tokenData: value })
-        // alert("First "+this.state.tokenData)
       }
     } catch (error) {
-      alert(error)
     }
   };
 
+  //Pull to Refresh
   refreshList() {
     this.setState({ isRefreshing: true, isLoading: true }, function () { this.getFeedList(), this.getFavouriteRecipeList() });
     setTimeout(() => {
@@ -180,11 +181,12 @@ class RecipeFeedComponent extends Component {
   }
 
 
-
+  //To Call API for Like 
   onLikeClick(item) {
     this.addToFavourite(item)
   }
 
+  //To Navigate to Recipe Detail Screen
   onRecipeClick(item) {
     this.props.navigation.navigate('internal', {
       id: item.recipeId,
@@ -192,16 +194,17 @@ class RecipeFeedComponent extends Component {
   }
 
 
+  //To Call API for Adding Recipe into Favourite Recipe List
   addToFavourite(item) {
 
     const data = this.props.navigation.getParam('data', '');
     if (item.inCookingList == 0) {
-      fetch('http://35.160.197.175:3006/api/v1/recipe/add-to-cooking-list',
+      fetch(ApiConstant.ADDTO_FAVOURITE_APIURL,
         {
-          method: 'POST',
+          method: ApiConstant.POST_METHOD,
           headers: {
             'Authorization': 'Bearer ' + data,
-            'Content-Type': 'application/json'
+            'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
           },
           body: JSON.stringify({
             'recipeId': item.recipeId,
@@ -216,21 +219,21 @@ class RecipeFeedComponent extends Component {
         this.getFeedList()
         this.getFavouriteRecipeList()
       }).catch((error) => {
-        console.log(error)
       });
     } else {
       this.removeFromFavourite(item)
     }
   }
 
+  //To Call API for removing recipe from Favourite Recipe List
   removeFromFavourite(item) {
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/rm-from-cooking-list',
+    fetch(ApiConstant.REMOVEFROM_FAVOURITE_APIURL,
       {
-        method: 'POST',
+        method: ApiConstant.POST_METHOD,
         headers: {
           'Authorization': 'Bearer ' + data,
-          'Content-Type': 'application/json'
+          'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
         },
         body: JSON.stringify({
           'recipeId': item.recipeId,
@@ -245,15 +248,15 @@ class RecipeFeedComponent extends Component {
       this.getFeedList()
       this.getFavouriteRecipeList()
     }).catch((error) => {
-      console.log(error)
     });
   }
 
+  //To Call API for getting Favourite Recipe List
   getFavouriteRecipeList() {
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/cooking-list',
+    fetch(ApiConstant.GETFAVOURITE_APIURL,
       {
-        method: 'GET',
+        method: ApiConstant.GET_METHOD,
         headers: {
           'Authorization': 'Bearer ' + data,
         },
@@ -271,15 +274,15 @@ class RecipeFeedComponent extends Component {
       });
       this.props.storeFavouriteFeed(this.state.dataFavouriteSource)
     }).catch((error) => {
-      console.log(error)
     });
   }
 
+  //To Call API for Delete recipe 
   onDeleteRecipe(item) {
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/' + item.recipeId,
+    fetch(ApiConstant.DELETE_APIURL + item.recipeId,
       {
-        method: 'DELETE',
+        method: ApiConstant.DELETE_METHOD,
         headers: {
           'Authorization': 'Bearer ' + data,
         },
@@ -297,16 +300,15 @@ class RecipeFeedComponent extends Component {
       });
       this.getFeedList()
     }).catch((error) => {
-      console.log(error)
     });
   }
 
+  //To Call API for All Recipe List
   getFeedList() {
-    alert('In Api'+this.state.tokenData)
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/feeds',
+    fetch(ApiConstant.FEED_APIURL,
       {
-        method: 'GET',
+        method: ApiConstant.GET_METHOD,
         headers: {
           'Authorization': 'Bearer ' + data,
         },
@@ -322,26 +324,12 @@ class RecipeFeedComponent extends Component {
         dataFeedSource: responseJson,
         isRefreshing: false
       });
-     // this.arrayHolder = responseJson
       this.props.storeFeed(this.state.dataFeedSource)
     }).catch((error) => {
-      console.log(error)
     });
   }
 
-  renderSeparator = () => {
-    return (
-      <View
-        style={{
-          height: 1,
-          width: '86%',
-          backgroundColor: '#000000',
-          marginLeft: '14%',
-        }}
-      />
-    );
-  };
-
+  //To Show SearchBar
   renderHeader = () => {
     return (
       <View style={{ paddingHorizontal: 10 }}>
@@ -368,34 +356,33 @@ class RecipeFeedComponent extends Component {
     );
   };
 
+  //To Call API for Search Recipe from List of All Recipe
   searchFilterFunction = text => {
     this.setState({
       value: text,
     });
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/feeds?q='+text,{
-      method : 'GET',
-      headers : {
-       'Authorization' : 'Bearer '+this.state.tokenData,
+    fetch(ApiConstant.SEARCH_FEED_APIURL + text, {
+      method: ApiConstant.GET_METHOD,
+      headers: {
+        'Authorization': 'Bearer ' + this.state.tokenData,
       },
-      URLSearchParams : {
-        'q' : text
+      URLSearchParams: {
+        'q': text
       }
     }).then((response) => {
-      console.log('success'+ response.status)
-      if(response.status == 200){
+      if (response.status == 200) {
         return response.json()
-      }else{
+      } else {
 
       }
-    }).then((responseJson)=>{
+    }).then((responseJson) => {
       this.arrayHolder = responseJson
       this.setState({
-        dataFeedSource : this.arrayHolder
+        dataFeedSource: this.arrayHolder
       })
       this.props.storeFeed(this.state.dataFeedSource)
-    }).catch((error) =>{
-      console.log(error)
+    }).catch((error) => {
     })
 
 
@@ -431,43 +418,43 @@ class RecipeFeedComponent extends Component {
             <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
               <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>Everyday meals curated for you</Text>
             </View>
-            {this.props.favouriteFeed!=null ?
-            <FlatList
-              horizontal={true}
-              data={this.props.favouriteFeed}
-              renderItem={({ item }) => {
-                return <View style={styles.horizontalImageViewContainer}>
-                  <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
-                    <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 50 }}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} defaultSource={placholder} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
+            {this.props.favouriteFeed != null ?
+              <FlatList
+                horizontal={true}
+                data={this.props.favouriteFeed}
+                renderItem={({ item }) => {
+                  return <View style={styles.horizontalImageViewContainer}>
+                    <View style={{ height: 200, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
+                      <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 50 }}>
+                        <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
-                      </ImageBackground>
-                    </TouchableWithoutFeedback>
-                    <View style={styles.transparentContainer}>
-                      <View style={[styles.rowContainer, { height: 30 }]}>
-                        <View style={styles.combineRowContainer}>
-                          <Image source={require('../images/fork.png')} style={{ width: 15, height: 15, tintColor: 'white' }}></Image>
-                          <Text style={[styles.textStyle, { fontSize: 12, marginTop: 0 }]}>{item.serves}</Text>
-                        </View>
-                        <View style={styles.combineRowContainer}>
-                          <Image source={require('../images/clock.png')} style={{ width: 15, height: 15, tintColor: 'white' }}></Image>
-                          <Text style={[styles.textStyle, { fontSize: 12, marginTop: 0 }]}>{item.preparationTime}</Text>
+                        </ImageBackground>
+                      </TouchableWithoutFeedback>
+                      <View style={styles.transparentContainer}>
+                        <View style={[styles.rowContainer, { height: 30 }]}>
+                          <View style={styles.combineRowContainer}>
+                            <Image source={require('../images/fork.png')} style={{ width: 15, height: 15, tintColor: 'white' }}></Image>
+                            <Text style={[styles.textStyle, { fontSize: 12, marginTop: 0 }]}>{item.serves}</Text>
+                          </View>
+                          <View style={styles.combineRowContainer}>
+                            <Image source={require('../images/clock.png')} style={{ width: 15, height: 15, tintColor: 'white' }}></Image>
+                            <Text style={[styles.textStyle, { fontSize: 12, marginTop: 0 }]}>{item.preparationTime}</Text>
+                          </View>
                         </View>
                       </View>
                     </View>
                   </View>
-                </View>
-              }}
-              keyExtractor={item => item.recipeId}
-            />
-            
+                }}
+                keyExtractor={item => item.recipeId}
+              />
 
-          :
-          <View style= {{justifyContent : 'center', alignItems : 'center' , backgroundColor : '#F9DAC6', height : 50}}>
-            <Text style ={{fontSize : 15,  marginTop: 10}}> No Favourite Recipe Found</Text>
+
+              :
+              <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9DAC6', height: 50 }}>
+                <Text style={{ fontSize: 15, marginTop: 10 }}> No Favourite Recipe Found</Text>
+              </View>
+            }
           </View>
-        }
-        </View>
           <View style={{ backgroundColor: '#F9DAC6' }}>
 
             <View style={styles.combineRowContainer}>
@@ -476,68 +463,68 @@ class RecipeFeedComponent extends Component {
             </View>
 
             <Text style={{ marginStart: 10, fontSize: 15, marginTop: 5 }}>First we eat, then we do everything else.</Text>
-            {this.props.feed!=null ?
-            <FlatList style={{ marginTop: 10 }}
-              data={this.props.feed}
-              renderItem={({ item }) => {
-                return (
-                  <View style={[styles.imageViewController, { borderColor: 'silver', borderWidth: 1, borderBottomWidth: 1 }]}>
-                    <View style={styles.topTitleContainer}>
-                      <View style={{ flexDirection: 'row', marginStart: 10 }}>
-                        <Image
-                          style={{ width: 30, height: 30, marginStart: 10, marginTop: 12 }}
-                          source={require('../images/cooking.png')}
-                        />
-                        <Text style={[styles.titleTextColor, { marginTop: 14 }]}>{item.firstName}{" "}{item.lastName}</Text>
+            {this.props.feed != null ?
+              <FlatList style={{ marginTop: 10 }}
+                data={this.props.feed}
+                renderItem={({ item }) => {
+                  return (
+                    <View style={[styles.imageViewController, { borderColor: 'silver', borderWidth: 1, borderBottomWidth: 1 }]}>
+                      <View style={styles.topTitleContainer}>
+                        <View style={{ flexDirection: 'row', marginStart: 10 }}>
+                          <Image
+                            style={{ width: 30, height: 30, marginStart: 10, marginTop: 12 }}
+                            source={require('../images/cooking.png')}
+                          />
+                          <Text style={[styles.titleTextColor, { marginTop: 14 }]}>{item.firstName}{" "}{item.lastName}</Text>
+                        </View>
+                        <TouchableWithoutFeedback onPress={() => this.onLikeClick(item)}>
+                          <Image
+                            style={{ width: 30, height: 30, marginTop: 12, marginRight: 20 }}
+                            source={(item.inCookingList == 0)
+                              ? require('../images/dislike.png')
+                              : require('../images/like.png')}
+                          />
+                        </TouchableWithoutFeedback>
                       </View>
-                      <TouchableWithoutFeedback onPress={() => this.onLikeClick(item)}>
-                        <Image
-                          style={{ width: 30, height: 30, marginTop: 12, marginRight: 20 }}
-                          source={(item.inCookingList == 0)
-                            ? require('../images/dislike.png')
-                            : require('../images/like.png')}
-                        />
-                      </TouchableWithoutFeedback>
-                    </View>
-                    <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)}>
-                      <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.imageContainer, { height: 178, marginBottom: 10 }]} resizeMode="cover">
-                        <View style={styles.transparentContainer}>
-                          <View style={styles.rowContainer}>
-                            <View style={styles.combineRowContainer}>
-                              <Image source={require('../images/effort.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                              <Text style={styles.textStyle}>{item.complexity}</Text>
-                            </View>
-                            <View style={styles.combineRowContainer}>
-                              <Image source={require('../images/fork.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                              <Text style={styles.textStyle}>{item.serves}</Text>
-                            </View>
-                            <View style={styles.combineRowContainer}>
-                              <Image source={require('../images/clock.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                              <Text style={styles.textStyle}>{item.preparationTime}</Text>
-                            </View>
-                            <View style={styles.combineRowContainer}>
-                              <TouchableWithoutFeedback onPress={() => this.onDeleteRecipe(item)} >
-                                <Image source={require('../images/bin.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
-                              </TouchableWithoutFeedback>
+                      <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)}>
+                        <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.imageContainer, { height: 178, marginBottom: 10 }]} resizeMode="cover">
+                          <View style={styles.transparentContainer}>
+                            <View style={styles.rowContainer}>
+                              <View style={styles.combineRowContainer}>
+                                <Image source={require('../images/effort.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                <Text style={styles.textStyle}>{item.complexity}</Text>
+                              </View>
+                              <View style={styles.combineRowContainer}>
+                                <Image source={require('../images/fork.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                <Text style={styles.textStyle}>{item.serves}</Text>
+                              </View>
+                              <View style={styles.combineRowContainer}>
+                                <Image source={require('../images/clock.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                <Text style={styles.textStyle}>{item.preparationTime}</Text>
+                              </View>
+                              <View style={styles.combineRowContainer}>
+                                <TouchableWithoutFeedback onPress={() => this.onDeleteRecipe(item)} >
+                                  <Image source={require('../images/bin.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                </TouchableWithoutFeedback>
+                              </View>
                             </View>
                           </View>
-                        </View>
-                      </ImageBackground>
-                    </TouchableWithoutFeedback>
+                        </ImageBackground>
+                      </TouchableWithoutFeedback>
 
 
-                  </View>
-                );
-              }}
-              keyExtractor={item => item.recipeId}
-              extraData={this.props.feed}
-              ListHeaderComponent={this.renderHeader}
-            />
-            :
-          <View style= {{justifyContent : 'center', alignItems : 'center' , backgroundColor : '#F9DAC6', height : Dimensions.get('window').height - 270}}>
-            <Text style ={{fontSize : 15,  marginTop: 10}}> No Recipe Found</Text>
-          </View>
-          }
+                    </View>
+                  );
+                }}
+                keyExtractor={item => item.recipeId}
+                extraData={this.props.feed}
+                ListHeaderComponent={this.renderHeader}
+              />
+              :
+              <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9DAC6', height: Dimensions.get('window').height - 270 }}>
+                <Text style={{ fontSize: 15, marginTop: 10 }}> No Recipe Found</Text>
+              </View>
+            }
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -546,7 +533,7 @@ class RecipeFeedComponent extends Component {
 }
 let i = 0
 const mapStateToProps = (state) => {
-  return { feed: state.GetCombineFeed.feed, favouriteFeed : state.GetCombineFeed.favouriteFeed}
+  return { feed: state.GetCombineFeed.feed, favouriteFeed: state.GetCombineFeed.favouriteFeed }
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -554,7 +541,7 @@ const mapDispatchToProps = (dispatch) => {
     storeFeed: (feed) => {
       dispatch(storeFeed(feed))
     },
-    storeFavouriteFeed : (favouriteFeed) =>{
+    storeFavouriteFeed: (favouriteFeed) => {
       dispatch(storeFavouriteFeed(favouriteFeed))
     }
   }

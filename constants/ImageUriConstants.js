@@ -1,0 +1,3 @@
+export const SPLASH_IMAGEURI = 'https://format-com-cld-res.cloudinary.com/image/private/s--6VjZBQmK--/c_limit,g_center,h_65535,w_550/fl_keep_iptc.progressive,q_95/v1/d0362d29eaed2a00e2aace5edc65be9e/Pasta_with_Curry-3.jpg'
+export const SIGNIN_IMAGEURI = 'https://lh5.googleusercontent.com/proxy/g87eEEzrDk1VMpfqhRMNmRD5KrLfuLQwEFwOFJp6zmLxBRiy2MuVHGuOl9ZyUuYOPFj09Ik8swH6g7-EXeplGlWnzKQTJzOGWKxXyJ13vCz7N6dxAqc0A0Wcmo2w0munsDGgpl0dfv-RbHnjfY0qMERQ2g'
+export const APPLOGO_IMAGEURI = `https://image.freepik.com/free-vector/cooking-with-love-hand-written-lettering-quote_116399-128.jpg` 

@@ -9,7 +9,8 @@ import {
     OutlinedTextField,
 } from 'react-native-material-textfield';
 import { TextInput } from 'react-native-paper';
-import moment from 'moment-timezone';
+import * as AppConstant from '../constants/AppConstants'
+import * as ApiConstant from '../constants/ApiConstants'
 
 const styles = StyleSheet.create({
 
@@ -138,17 +139,18 @@ export default class RecipeDetailsComponent extends Component {
         }
     }
 
+    //To get token from AsyncStorage
     retrieveData = async () => {
         try {
-            const value = await AsyncStorage.getItem('authTokenStore');
+            const value = await AsyncStorage.getItem(AppConstant.AUTHTOKEN);
             if (value !== null) {
                 this.setState({ getToken: value })
             }
         } catch (error) {
-            alert(error)
         }
     };
 
+    //To show ingredients list into renderBottomView
     onShowIngredients() {
 
         this.setState({ viewSection: true })
@@ -157,6 +159,7 @@ export default class RecipeDetailsComponent extends Component {
         }
     }
 
+    //To show instructions list into renderBottomView
     onShowInstructions() {
         this.setState({ viewSection: false })
         if (!this.state.instructionSelectedButton) {
@@ -164,6 +167,7 @@ export default class RecipeDetailsComponent extends Component {
         }
     }
 
+    //To share data with other apps
     onShareData = () => {
         const recipeMessage = "Recipe Name : " + this.state.recipeName + "\n Complexity : " + this.state.complexity + "\n Youtube Link : " + this.state.youtubeUrl
         this.setState({
@@ -175,17 +179,17 @@ export default class RecipeDetailsComponent extends Component {
             }).then(result => console.log(result)).catch(errorMsg => console.log(errorMsg));
     }
 
+    //To Call API for Add Comment
     addComment() {
         this.textComment.clear()
         const recipeId = this.props.navigation.getParam('id', '');
         const data = this.props.navigation.getParam('data', '');
-        console.log("recipeId : " + data)
-        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments', {
+        fetch(ApiConstant.COMMON_APIURL + recipeId + '/comments', {
 
-            method: 'POST',
+            method: ApiConstant.POST_METHOD,
             headers: {
                 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
-                'Content-Type': 'application/json'
+                'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
             },
             body: JSON.stringify({
                 'comment': this.state.addedComment,
@@ -197,25 +201,24 @@ export default class RecipeDetailsComponent extends Component {
             }
         }).then((responseJson) => {
             const { msg } = responseJson
-            console.log(msg)
             this.setState({
                 addedComment: ''
             })
             this.getComment()
         }).catch((error) => {
-            console.log(error)
         })
     }
 
+    //To Call API for Get Comment
     getComment() {
         const recipeId = this.props.navigation.getParam('id', '');
         const data = this.props.navigation.getParam('data', '');
-        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments', {
+        fetch(ApiConstant.COMMON_APIURL + recipeId + '/comments', {
 
-            method: 'GET',
+            method: ApiConstant.GET_METHOD,
             headers: {
                 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
-                'Content-Type': 'application/json'
+                'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
             },
         }).then((response) => {
             if (response.status == 200) {
@@ -244,29 +247,26 @@ export default class RecipeDetailsComponent extends Component {
             })
 
         }).catch((error) => {
-            console.log(error)
         })
     }
 
+    //To Call API for Edit Comment
     editComment(commentId) {
         this.setState({ innerViewVisible: false })
-        alert(this.state.updatedComment)
         const recipeId = this.props.navigation.getParam('id', '');
         const data = this.props.navigation.getParam('data', '');
-        console.log(recipeId + " " + commentId + " " + this.state.updatedComment)
-        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments/' + commentId, {
+        fetch(ApiConstant.COMMON_APIURL + recipeId + '/comments/' + commentId, {
 
-            method: 'PUT',
+            method: ApiConstant.PUT_METHOD,
             headers: {
                 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
-                'Content-Type': 'application/json'
+                'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
             },
             body: JSON.stringify({
                 'comment': this.state.updatedComment,
             })
         }).then((response) => {
             if (response.status == 200) {
-                alert("All Good")
 
                 return response.json()
             } else {
@@ -275,16 +275,16 @@ export default class RecipeDetailsComponent extends Component {
         }).then((responseJson) => {
             this.getComment()
         }).catch((error) => {
-            console.log(error)
         })
     }
 
+    //To Call API for Delete Comment
     deleteComment(commentId) {
         const recipeId = this.props.navigation.getParam('id', '');
         const data = this.props.navigation.getParam('data', '');
-        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/comments/' + commentId, {
+        fetch(ApiConstant.COMMON_APIURL + recipeId + '/comments/' + commentId, {
 
-            method: 'DELETE',
+            method: ApiConstant.DELETE_METHOD,
             headers: {
                 'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
                 'Content-Type': 'application/json'
@@ -299,15 +299,15 @@ export default class RecipeDetailsComponent extends Component {
 
             this.getComment()
         }).catch((error) => {
-            console.log(error)
         })
     }
 
+    //To Call API for Recipe Details
     getRecipeDetails() {
         const recipeId = this.props.navigation.getParam('id', '');
         const data = this.props.navigation.getParam('data', '');
-        fetch('http://35.160.197.175:3006/api/v1/recipe/' + recipeId + '/details', {
-            method: 'GET',
+        fetch(ApiConstant.COMMON_APIURL + recipeId + '/details', {
+            method: ApiConstant.GET_METHOD,
             headers: {
                 'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
             }
@@ -352,9 +352,9 @@ export default class RecipeDetailsComponent extends Component {
                 isLoading: false
             })
         }).catch((error) => {
-            console.log(error)
         })
     }
+
     componentDidMount() {
         this.retrieveData()
         this.setState({
@@ -363,6 +363,8 @@ export default class RecipeDetailsComponent extends Component {
         this.getRecipeDetails()
         this.getComment()
     }
+
+    //To know on which comment user clicked
     typeSelected(value) {
         this.setState({
             itemPressed: value,
@@ -371,6 +373,7 @@ export default class RecipeDetailsComponent extends Component {
 
     }
 
+    //Comment list View
     renderTouchableHighlight(comments, commentIds, commenttime, commentwriter, index) {
         let diffTime
         var currentDate = new Date();

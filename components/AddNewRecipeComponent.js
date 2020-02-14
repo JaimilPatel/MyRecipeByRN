@@ -1,14 +1,16 @@
 import React, { Component } from 'react';
-import { StyleSheet, Text, View, Dimensions, Image, ScrollView,FlatList, TouchableOpacity} from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Image, ScrollView, FlatList, TouchableOpacity } from 'react-native';
 import {
   OutlinedTextField,
 } from 'react-native-material-textfield';
-import {Dropdown } from 'react-native-material-dropdown'
+import { Dropdown } from 'react-native-material-dropdown'
 import TagInput from 'react-native-tags-input';
 import ImagePicker from 'react-native-image-picker';
 import AsyncStorage from '@react-native-community/async-storage'
 import { storeIngredient, storeInstruction } from '../actions/combineDetailsAction';
 import { connect } from 'react-redux';
+import * as AppConstant from '../constants/AppConstants'
+import * as ApiConstant from '../constants/ApiConstants'
 
 const mainColor = '#3ca897';
 
@@ -37,7 +39,7 @@ const styles = StyleSheet.create({
   },
   touchableButton: {
     alignItems: 'center',
-    backgroundColor:'#DC7633',
+    backgroundColor: '#DC7633',
     width: 310,
     justifyContent: "center",
     borderRadius: 10,
@@ -134,41 +136,41 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width,
     height: 50,
     padding: 5,
-    marginHorizontal : 20
-},
-circle: {
-  width: 30,
-  height: 30,
-  borderRadius: 100 / 2,
-  backgroundColor: '#DC7633',
-  justifyContent: 'center',
-  alignItems: "center"
-},
-images: {
-  width: 150,
-  height: 150,
-  marginHorizontal: 3,
-  marginTop : 10,
-  marginStart : 50
-},
+    marginHorizontal: 20
+  },
+  circle: {
+    width: 30,
+    height: 30,
+    borderRadius: 100 / 2,
+    backgroundColor: '#DC7633',
+    justifyContent: 'center',
+    alignItems: "center"
+  },
+  images: {
+    width: 150,
+    height: 150,
+    marginHorizontal: 3,
+    marginTop: 10,
+    marginStart: 50
+  },
 })
 class AddNewRecipeComponent extends Component {
 
   static navigationOptions = {
     headerShown: false,
     title: '',
-      tabBarIcon: ({ focused , tintColor }) => {
-        if (focused) {
-            return  <Image
-            source={require('../images/plus.png')}
-            style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
-          />
-        } else {
-          return  <Image
+    tabBarIcon: ({ focused, tintColor }) => {
+      if (focused) {
+        return <Image
+          source={require('../images/plus.png')}
+          style={{ width: 26, height: 26, tintColor: tintColor, marginBottom: 10 }}
+        />
+      } else {
+        return <Image
           source={require('../images/plus.png')}
           style={{ width: 26, height: 26, tintColor: 'white', marginBottom: 10 }}
         />
-        }
+      }
     }
   }
 
@@ -190,9 +192,9 @@ class AddNewRecipeComponent extends Component {
       ingredientsArray: [],
       oneInstruction: '',
       instructionsArray: [],
-      uploadImage : undefined,
-      uploadImageUri : '',
-      getToken : ''
+      uploadImage: undefined,
+      uploadImageUri: '',
+      getToken: ''
     }
   }
 
@@ -200,20 +202,22 @@ class AddNewRecipeComponent extends Component {
     this.retrieveData()
   }
 
+  //To Pick Image
   showImagePicker = () => {
     ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
-        if (res.didCancel) {
-        } else if (res.error) {
-            console.log("Error", res.error);
-        } else {
-            this.setState({
-                uploadImage: { uri: res.uri },
-                uploadImageUri : res.uri
-            });
+      if (res.didCancel) {
+      } else if (res.error) {
+      } else {
+        this.setState({
+          uploadImage: { uri: res.uri },
+          uploadImageUri: res.uri
+        });
 
-        }
+      }
     });
-}
+  }
+
+  //To add Ingredients
   addToIngredients = () => {
     var newIngredient = this.state.oneIngredient
     var arr = this.state.ingredientsArray
@@ -223,6 +227,7 @@ class AddNewRecipeComponent extends Component {
     this.props.storeIngredient(arr)
   }
 
+  //To add Instructions
   addToInstructions = () => {
     var newInstruction = this.state.oneInstruction
     var arr = this.state.instructionsArray
@@ -232,31 +237,33 @@ class AddNewRecipeComponent extends Component {
     this.props.storeInstruction(arr)
   }
 
+  //To update Tags
   updateTagState = (state) => {
     this.setState({
       tags: state
     })
   };
 
+  //To get Token From AsyncStorage
   retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('authTokenStore');
+      const value = await AsyncStorage.getItem(AppConstant.AUTHTOKEN);
       if (value !== null) {
         this.setState({ getToken: value })
       }
     } catch (error) {
-      alert(error)
     }
   };
 
+  //To call API for Add New Recipe
   onAddRecipe(recipeName, preprationTime, noOfServes, complexity, youTubeURL, tags) {
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/add',
+    fetch(ApiConstant.ADD_RECIPE_APIURL,
       {
-        method: 'POST',
+        method: ApiConstant.POST_METHOD,
         headers: {
-          'Authorization': 'Bearer ' + data,
-          'Content-Type': 'application/json'
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+          'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
         },
         body: JSON.stringify({
           'name': recipeName,
@@ -274,24 +281,24 @@ class AddNewRecipeComponent extends Component {
       }
     }).then((responseJson) => {
       const { id } = responseJson
-      this.addIngredientsAndInstruction(id)      
+      this.addIngredientsAndInstruction(id)
     }).catch((error) => {
-      console.log(error)
     });
   }
 
+  //To call API for add ingredients and instructions
   addIngredientsAndInstruction(id) {
     const data = this.props.navigation.getParam('data', '');
-    for (var ingre in this.state.ingredientsArray) {
-      fetch('http://35.160.197.175:3006/api/v1/recipe/add-ingredient',
+    for (var ingre in this.props.ingredients) {
+      fetch(ApiConstant.ADD_INGREDIENT_APIURL,
         {
-          method: 'POST',
+          method: ApiConstant.POST_METHOD,
           headers: {
-            'Authorization': 'Bearer ' + data,
-            'Content-Type': 'application/json'
+            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
           },
           body: JSON.stringify({
-            'ingredient': this.state.ingredientsArray[ingre].toString(),
+            'ingredient': this.props.ingredients[ingre].toString(),
             'recipeId': id,
           })
         }
@@ -303,19 +310,18 @@ class AddNewRecipeComponent extends Component {
       }).then((responseJson) => {
         this.onUpdateRecipePhoto(id)
       }).catch((error) => {
-        console.log(error)
       });
     }
-    for (var inst in this.state.instructionsArray) {
-      fetch('http://35.160.197.175:3006/api/v1/recipe/add-instruction',
+    for (var inst in this.props.instructions) {
+      fetch(ApiConstant.ADD_INSTRUCTION_APIURL,
         {
-          method: 'POST',
+          method: ApiConstant.POST_METHOD,
           headers: {
-            'Authorization': 'Bearer ' + data,
-            'Content-Type': 'application/json'
+            'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
+            'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
           },
           body: JSON.stringify({
-            'instruction': this.state.instructionsArray[inst].toString(),
+            'instruction': this.props.instructions[inst].toString(),
             'recipeId': id,
           })
         }
@@ -326,33 +332,34 @@ class AddNewRecipeComponent extends Component {
         }
       }).then((responseJson) => {
       }).catch((error) => {
-        console.log(error)
       });
     }
 
   }
 
- createFormData = (id) => {
+  //To pass Form-Data type value
+  createFormData = (id) => {
     const data = new FormData();
     var photo = {
-        uri: this.state.uploadImage.uri,
-        type: 'image/png',
-        name: 'photo.png',
+      uri: this.state.uploadImage.uri,
+      type: 'image/png',
+      name: 'photo.png',
     };
     data.append("photo", photo);
-    data.append("recipeId",id)
+    data.append("recipeId", id)
     return data;
   };
 
+  //To call API for Add Image of particular recipe
   onUpdateRecipePhoto(id) {
     const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/add-update-recipe-photo',
+    fetch(ApiConstant.UPDATE_RECIPE_IMAGE_APIURL,
       {
-        method: 'POST',
+        method: ApiConstant.POST_METHOD,
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpZCI6Mn0.MGBf-reNrHdQuwQzRDDNPMo5oWv4GlZKlDShFAAe16s',
         },
-       body :  this.createFormData(id)
+        body: this.createFormData(id)
       }
     ).then((response) => {
       if (response.status == 200) {
@@ -360,12 +367,12 @@ class AddNewRecipeComponent extends Component {
       } else {
       }
     }).then((responseJson) => {
-      this.props.navigation.navigate('RecipeFeed')
+      this.props.navigation.navigate(AppConstant.FEEDROUTE)
     }).catch((error) => {
-      console.log(error)
     });
   }
 
+  //To Display which image user selected
   renderFileUri() {
     if (this.state.uploadImageUri) {
       return <Image
@@ -391,7 +398,7 @@ class AddNewRecipeComponent extends Component {
     return (
       <ScrollView style={styles.scrollContainer}>
         <View style={styles.container}>
-          <View style={{ backgroundColor:'#DC7633', height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ backgroundColor: '#DC7633', height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
             <View style={{ flexDirection: 'row', }}>
               <Image
                 style={{ width: 30, height: 30, }}
@@ -406,17 +413,17 @@ class AddNewRecipeComponent extends Component {
               keyboardType='default'
               ref={this.fieldRef}
               value={this.state.recipeName}
-              tintColor = '#DC7633'
+              tintColor='#DC7633'
               onChangeText={(recipeName) => this.setState({ recipeName })}
             />
           </View>
           <View style={[styles.outLinedTextField, { marginTop: 5 }]}>
             <OutlinedTextField
-            selectionColor = 'black'
+              selectionColor='black'
               label='Prepration Time'
               keyboardType='default'
               ref={this.fieldRef}
-              tintColor = '#DC7633'
+              tintColor='#DC7633'
               value={this.state.preprationTime}
               onChangeText={(preprationTime) => this.setState({ preprationTime })}
             />
@@ -426,7 +433,7 @@ class AddNewRecipeComponent extends Component {
               label='Serves'
               keyboardType='numeric'
               ref={this.fieldRef}
-              tintColor = '#DC7633'
+              tintColor='#DC7633'
               value={this.state.noOfServes}
               onChangeText={(noOfServes) => this.setState({ noOfServes })}
             />
@@ -461,7 +468,7 @@ class AddNewRecipeComponent extends Component {
                 label='Click Below to Add One Ingredient'
                 keyboardType='default'
                 ref={input => { this.textIngredient = input }}
-                tintColor = '#DC7633'
+                tintColor='#DC7633'
                 value={this.state.oneIngredient}
                 onChangeText={(oneIngredient) => this.setState({ oneIngredient })}
               />
@@ -474,75 +481,75 @@ class AddNewRecipeComponent extends Component {
           </View>
 
           <FlatList
-          style = {{marginTop : 5}}
-          data={this.props.ingredients}
-          renderItem={({ item , index }) => {
-            return  <View key={index}>
-                        <View style={styles.topTitleContainer}>
-                            <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50 }}>
-                                <View style={styles.circle}>
-                                    <Text>{index}</Text>
-                                </View>
-                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.props.ingredients[index].toString()}</Text>
-                            </View>
-                        </View>
+            style={{ marginTop: 5 }}
+            data={this.props.ingredients}
+            renderItem={({ item, index }) => {
+              return <View key={index}>
+                <View style={styles.topTitleContainer}>
+                  <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50 }}>
+                    <View style={styles.circle}>
+                      <Text>{index}</Text>
                     </View>
-          }}
-          extraData={this.state} 
-        />
+                    <Text style={[styles.titleTextColor, { marginTop: 1 }]}>{this.props.ingredients[index].toString()}</Text>
+                  </View>
+                </View>
+              </View>
+            }}
+            extraData={this.state}
+          />
           <View style={{ flexDirection: 'row' }}>
-          <View style={[styles.outLinedTextField, { marginTop: 20 , flex : 0.9 }]}>
-            <OutlinedTextField
-              label='Click Below to Add One Instruction'
-              keyboardType='default'
-              ref={input => { this.textInstruction = input }}
-              tintColor = '#DC7633'
-              value={this.state.oneInstruction}
-              onChangeText={(oneInstruction) => this.setState({ oneInstruction })}
-            />
-          </View>
-            <TouchableOpacity style={[styles.touchableButton, { width: 50, height: 50 ,marginTop: 20,}]} onPress={() => this.addToInstructions()}>
+            <View style={[styles.outLinedTextField, { marginTop: 20, flex: 0.9 }]}>
+              <OutlinedTextField
+                label='Click Below to Add One Instruction'
+                keyboardType='default'
+                ref={input => { this.textInstruction = input }}
+                tintColor='#DC7633'
+                value={this.state.oneInstruction}
+                onChangeText={(oneInstruction) => this.setState({ oneInstruction })}
+              />
+            </View>
+            <TouchableOpacity style={[styles.touchableButton, { width: 50, height: 50, marginTop: 20, }]} onPress={() => this.addToInstructions()}>
               <Text style={{ color: 'black', fontSize: 30 }}>+</Text>
             </TouchableOpacity>
           </View>
           <FlatList
-          style = {{marginTop : 5}}
-          data={this.props.instructions}
-          renderItem={({ item , index }) => {
-            return  <View key={index}>
-                        <View style={styles.topTitleContainer}>
-                            <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50 }}>
-                                <View style={styles.circle}>
-                                    <Text>{index}</Text>
-                                </View>
-                                <Text style={[styles.titleTextColor, {marginTop : 1}]}>{this.props.instructions[index].toString()}</Text>
-                            </View>
-                        </View>
+            style={{ marginTop: 5 }}
+            data={this.props.instructions}
+            renderItem={({ item, index }) => {
+              return <View key={index}>
+                <View style={styles.topTitleContainer}>
+                  <View style={{ flexDirection: 'row', marginStart: 10, width: Dimensions.get('window').width - 50 }}>
+                    <View style={styles.circle}>
+                      <Text>{index}</Text>
                     </View>
-          }}
-          extraData={this.state}
-        />
+                    <Text style={[styles.titleTextColor, { marginTop: 1 }]}>{this.props.instructions[index].toString()}</Text>
+                  </View>
+                </View>
+              </View>
+            }}
+            extraData={this.state}
+          />
           <View style={[styles.outLinedTextField, { marginTop: 10 }]}>
             <OutlinedTextField
               label='Youtube URL'
               keyboardType='default'
               ref={this.fieldRef}
-              tintColor = '#DC7633'
+              tintColor='#DC7633'
               value={this.state.youTubeURL}
               onChangeText={(youTubeURL) => this.setState({ youTubeURL })}
             />
           </View>
           <View style={styles.centerContainer}>
-          <View style={{ flexDirection: 'row', alignItems : "center" }}>
-            <TouchableOpacity style={[styles.touchableButton, {height : 50, width : 150}]} onPress={() => this.showImagePicker()}>
-              <Text style={[styles.titleTextColor,{ color: 'black', fontSize : 15 }]}>Upload Image</Text>
-            </TouchableOpacity>
-            <View>
+            <View style={{ flexDirection: 'row', alignItems: "center" }}>
+              <TouchableOpacity style={[styles.touchableButton, { height: 50, width: 150 }]} onPress={() => this.showImagePicker()}>
+                <Text style={[styles.titleTextColor, { color: 'black', fontSize: 15 }]}>Upload Image</Text>
+              </TouchableOpacity>
+              <View>
                 {this.renderFileUri()}
               </View>
-              </View>
-            <TouchableOpacity style={[styles.touchableButton, {marginBottom : 10}]} onPress={() => this.onAddRecipe(this.state.recipeName, this.state.preprationTime, this.state.noOfServes, this.state.complexity, this.state.youTubeURL, this.state.tags)}>
-              <Text style={[styles.titleTextColor,{ color: 'black' , fontSize : 15}]}>Add Recipe</Text>
+            </View>
+            <TouchableOpacity style={[styles.touchableButton, { marginBottom: 10 }]} onPress={() => this.onAddRecipe(this.state.recipeName, this.state.preprationTime, this.state.noOfServes, this.state.complexity, this.state.youTubeURL, this.state.tags)}>
+              <Text style={[styles.titleTextColor, { color: 'black', fontSize: 15 }]}>Add Recipe</Text>
             </TouchableOpacity>
           </View>
 
@@ -553,7 +560,7 @@ class AddNewRecipeComponent extends Component {
 }
 
 const mapStateToProps = (state) => {
-  return { ingredients: state.AddCombineDetails.ingredients , instructions : state.AddCombineDetails.instructions}
+  return { ingredients: state.AddCombineDetails.ingredients, instructions: state.AddCombineDetails.instructions }
 }
 
 const mapDispatchToProps = (dispatch) => {
@@ -561,7 +568,7 @@ const mapDispatchToProps = (dispatch) => {
     storeIngredient: (ingredients) => {
       dispatch(storeIngredient(ingredients))
     },
-    storeInstruction : (instructions) => {
+    storeInstruction: (instructions) => {
       dispatch(storeInstruction(instructions))
     }
   }

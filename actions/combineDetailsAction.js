@@ -1,12 +1,14 @@
-export function storeIngredient(ingredients){
-    return{
+//To Store Ingredient into Redux Store
+export function storeIngredient(ingredients) {
+    return {
         type: 'STORE_INGREDIENTS',
         value: ingredients
     };
 }
-export function storeInstruction(instructions){
-    return{
-        type : 'STORE_INSTRUCTIONS',
-        value : instructions
+//To Store Instruction into Redux Store
+export function storeInstruction(instructions) {
+    return {
+        type: 'STORE_INSTRUCTIONS',
+        value: instructions
     }
 }

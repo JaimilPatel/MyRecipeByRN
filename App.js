@@ -1,5 +1,5 @@
 import React from 'react';
-import { createAppContainer, createSwitchNavigator} from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import store from './store/store';
 import { Provider } from 'react-redux';
 import SignInComponent from './components/SignInComponent';
@@ -11,73 +11,73 @@ import { createStackNavigator } from 'react-navigation-stack';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import SplashComponent from './components/SplashComponent';
 
- const internalNavigator = createStackNavigator({
-   RecipeDetail : {screen : RecipeDetailsComponent}
- },{
-  initialRouteName : 'RecipeDetail',
+const internalNavigator = createStackNavigator({
+  RecipeDetail: { screen: RecipeDetailsComponent }
+}, {
+  initialRouteName: 'RecipeDetail',
   headerMode: 'none',
-  mode : 'card',
+  mode: 'card',
   navigationOptions: {
-      headerVisible: false,
+    headerVisible: false,
   }
 })
 
- const homeNavigator = createMaterialBottomTabNavigator({
-  
-  RecipeFeed : {
-    screen : RecipeFeedComponent,
-    navigationOptions:{
-      tabBarLabel : 'Feed'
+const homeNavigator = createMaterialBottomTabNavigator({
+
+  RecipeFeed: {
+    screen: RecipeFeedComponent,
+    navigationOptions: {
+      tabBarLabel: 'Feed'
     }
   },
-  AddRecipe : {
-    screen : AddNewRecipeComponent,
-    navigationOptions : {
-      tabBarLabel : 'Add Recipe'
+  AddRecipe: {
+    screen: AddNewRecipeComponent,
+    navigationOptions: {
+      tabBarLabel: 'Add Recipe'
     }
   },
-  Profile : {
-    screen : ProfileComponent,
-    navigationOptions : {
-      tabBarLabel : 'Profile'
+  Profile: {
+    screen: ProfileComponent,
+    navigationOptions: {
+      tabBarLabel: 'Profile'
     }
   },
-},{
-  barStyle: {backgroundColor:'#DC7633'},
-  initialRouteName : 'RecipeFeed',
+}, {
+  barStyle: { backgroundColor: '#DC7633' },
+  initialRouteName: 'RecipeFeed',
   headerMode: 'none',
   navigationOptions: {
-      headerVisible: false,
+    headerVisible: false,
   }
 })
-const authNavigator  = createSwitchNavigator({
-  Splash: {screen: SplashComponent},
-  SignIn: {screen: SignInComponent},
-  transfer  : homeNavigator
-},{
+const authNavigator = createSwitchNavigator({
+  Splash: { screen: SplashComponent },
+  SignIn: { screen: SignInComponent },
+  transfer: homeNavigator
+}, {
   headerMode: 'none',
   navigationOptions: {
-      headerVisible: false,
+    headerVisible: false,
   }
- })
+})
 
 const rootNavigator = createStackNavigator({
-  auth : authNavigator,
-  home : homeNavigator , 
-  internal  :internalNavigator
-},{
-  initialRouteName : 'auth',
+  auth: authNavigator,
+  home: homeNavigator,
+  internal: internalNavigator
+}, {
+  initialRouteName: 'auth',
   headerMode: 'none',
   navigationOptions: {
-      headerVisible: false,
+    headerVisible: false,
   }
 })
 
 const AppContainer = createAppContainer(rootNavigator)
 
-export default function App(){
-  return <Provider store = {store}>
-    <AppContainer/>
+export default function App() {
+  return <Provider store={store}>
+    <AppContainer />
   </Provider>
 }
 

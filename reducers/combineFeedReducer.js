@@ -1,10 +1,11 @@
-function GetCombineFeed(state = { feed: [], favouriteFeed : []}, action = {}){
-    switch(action.type){
+//To Return  RecipeFeed and RecipeFavouriteFeed from Redux Store
+function GetCombineFeed(state = { feed: [], favouriteFeed: [] }, action = {}) {
+    switch (action.type) {
         case 'STORE_FEED':
-            return { ...state ,feed: action.value }  
-        case  'STORE_FAVOURITE_FEED' : 
-        return { ...state, favouriteFeed : action.value}
-        default : return state
+            return { ...state, feed: action.value }
+        case 'STORE_FAVOURITE_FEED':
+            return { ...state, favouriteFeed: action.value }
+        default: return state
     }
 }
- export default GetCombineFeed
+export default GetCombineFeed

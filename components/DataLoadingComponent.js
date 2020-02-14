@@ -1,6 +1,7 @@
 import React from 'react'
 import { View, ActivityIndicator } from 'react-native'
 
+//Custom ActivityIndicator
 export default function DataLoadingComponent(props) {
     if (props.isLoading) {
         return <View style={{ position: 'absolute', width: '100%', height: '110%', zIndex: 1 }}>

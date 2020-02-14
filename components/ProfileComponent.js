@@ -5,6 +5,7 @@ import { TouchableWithoutFeedback, ScrollView } from 'react-native-gesture-handl
 import AsyncStorage from '@react-native-community/async-storage'
 import DataLoadingComponent from './DataLoadingComponent'
 import { connect } from 'react-redux';
+import * as AppConstant from '../constants/AppConstants'
 
 const styles = StyleSheet.create({
 
@@ -155,52 +156,19 @@ class ProfileComponent extends Component {
     }
   }
 
+  //To get Token from AsyncStorage
   retrieveData = async () => {
     try {
-      const value = await AsyncStorage.getItem('authTokenStore');
+      const value = await AsyncStorage.getItem(AppConstant.AUTHTOKEN);
       if (value !== null) {
         this.setState({ getAuthorizedToken: value })
       }
     } catch (error) {
-      alert(error)
     }
   };
 
-  componentDidMount() {
-    this.retrieveData()
-    this.getFavouriteRecipeList()
-  }
-
-  getFavouriteRecipeList() {
-    const data = this.props.navigation.getParam('data', '');
-    fetch('http://35.160.197.175:3006/api/v1/recipe/feeds',
-      {
-        method: 'GET',
-        headers: {
-          'Authorization': 'Bearer '+data
-        },
-      }
-    ).then((response) => {
-      if (response.status == 200) {
-        return response.json()
-      } else {
-      }
-    }).then((responseJson) => {
-      const { firstName } = responseJson[0]
-      const { lastName } = responseJson[0]
-      this.setState({
-        dataFavouriteFeedSource: responseJson,
-        getFirstName: firstName,
-        getLastName: lastName,
-        isRefreshing : false
-      });
-
-    }).catch((error) => {
-      console.log(error)
-    });
-  }
   render() {
-    if (this.state.isRefreshing) {
+    if (this.props.favouriteFeed == null) {
       return (
         <View style={{ flex: 1, paddingTop: 20, justifyContent: "center" }}>
           <DataLoadingComponent isLoading={this.state.isLoading} style={{ flex: 1, paddingTop: 20, justifyContent: "center" }} />
@@ -219,7 +187,7 @@ class ProfileComponent extends Component {
               />
             </View>
             <View style={{ height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
-              <Text style={[styles.titleTextColor, { marginTop: 5, fontWeight  :"bold" }]}>{this.state.getFirstName + ' ' + this.state.getLastName}</Text>
+              <Text style={[styles.titleTextColor, { marginTop: 5, fontWeight: "bold" }]}>Jay Mehta</Text>
             </View>
             <View style={{ flexDirection: 'row', marginStart: 10 }}>
               <Image
@@ -229,16 +197,13 @@ class ProfileComponent extends Component {
               <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Easy Recipes For Beginners</Text>
             </View>
             <FlatList
-              refreshControl={
-                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
-              }
               horizontal={true}
               data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Easy') {
                   return <View style={styles.horizontalImageViewContainer}>
                     <View style={{ height: 190, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
-                      <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 150 }}>
+                      <TouchableWithoutFeedback style={{ height: 150 }}>
                         <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
                         </ImageBackground>
@@ -264,16 +229,13 @@ class ProfileComponent extends Component {
               <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Medium Recipes For Learners</Text>
             </View>
             <FlatList
-              refreshControl={
-                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
-              }
               horizontal={true}
               data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Medium') {
                   return <View style={styles.horizontalImageViewContainer}>
                     <View style={{ height: 190, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
-                      <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 150 }}>
+                      <TouchableWithoutFeedback style={{ height: 150 }}>
                         <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
 
                         </ImageBackground>
@@ -299,16 +261,14 @@ class ProfileComponent extends Component {
               <Text style={[styles.titleTextColor, { marginTop: 5 }]}>Complex Recipes For Experts</Text>
             </View>
             <FlatList
-              refreshControl={
-                <RefreshControl refreshing={this.state.isRefreshing} onRefresh={() => this.refreshList()}></RefreshControl>
-              }
+
               horizontal={true}
               data={this.props.favouriteFeed}
               renderItem={({ item }) => {
                 if (item.complexity == 'Complex') {
                   return <View style={styles.horizontalImageViewContainer}>
                     <View style={{ height: 190, backgroundColor: 'white', margin: 10, borderRadius: 10, borderColor: 'silver', borderWidth: 1, }}>
-                      <TouchableWithoutFeedback onPress={() => this.onRecipeClick(item)} style={{ height: 150 }}>
+                      <TouchableWithoutFeedback style={{ height: 150 }}>
                         <ImageBackground source={item.photo != null ? { uri: item.photo } : require('../images/recipe.jpg')} style={[styles.horizontalImageContainer, { height: 200, flex: 0.95 }]} resizeMode="cover">
                         </ImageBackground>
                       </TouchableWithoutFeedback>
@@ -332,6 +292,6 @@ class ProfileComponent extends Component {
   }
 }
 const mapStateToProps = (state) => {
-  return { favouriteFeed : state.GetCombineFeed.favouriteFeed}
+  return { favouriteFeed: state.GetCombineFeed.favouriteFeed }
 }
 export default connect(mapStateToProps)(ProfileComponent)

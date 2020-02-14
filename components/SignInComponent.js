@@ -4,8 +4,9 @@ import {
   OutlinedTextField,
 } from 'react-native-material-textfield'
 import AsyncStorage from '@react-native-community/async-storage'
-import { storeToken } from '../actions/authAction';
-import { connect } from 'react-redux';
+import * as AppConstant from '../constants/AppConstants'
+import * as ApiConstant from '../constants/ApiConstants'
+import * as ImageConstant from '../constants/ImageUriConstants'
 
 
 const styles = StyleSheet.create({
@@ -113,9 +114,10 @@ export default class SignInComponent extends Component {
 
   constructor() {
     super()
-    this.state = { email: 'jm1@example.com', password: 'jay@123', authToken: null }
+    this.state = { email: '', password: '', authToken: null }
   }
 
+  //To Call API for Sign In
   onSignIn(email, password) {
     if (email == '' || password == '') {
       if (email == '' && password == '') {
@@ -124,11 +126,11 @@ export default class SignInComponent extends Component {
       } else if (password == '') {
       }
     } else {
-      fetch('http://35.160.197.175:3006/api/v1/user/login',
+      fetch(ApiConstant.SIGN_IN_APIURL,
         {
-          method: 'POST',
+          method: ApiConstant.POST_METHOD,
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
           },
           body: JSON.stringify({
             'email': email,
@@ -136,37 +138,32 @@ export default class SignInComponent extends Component {
           })
         }).then((response) => {
           if (response.status == 200) {
-
             return response.json()
           } else {
-            alert("Login Failed")
           }
         }).then((responseJson) => {
-
           const { token } = responseJson
           this.setState({
             authToken: token
           });
           this.storeData(responseJson)
-          this.props.navigation.navigate('RecipeFeed', {
+          this.props.navigation.navigate(AppConstant.FEEDROUTE, {
             data: this.state.authToken
           });
           return responseJson
         }).catch((error) => {
-          console.log(error)
         });
     }
 
   }
 
+  //To store token into AsyncStorage
   storeData = async (responseJSON) => {
-   
+
     const { token } = responseJSON
-    alert(token)
     try {
-      await AsyncStorage.setItem('authTokenStore', token)
+      await AsyncStorage.setItem(AppConstant.AUTHTOKEN, token)
     } catch (e) {
-      console.log('' + e);
     }
   }
 
@@ -174,7 +171,7 @@ export default class SignInComponent extends Component {
     return (
 
       <ImageBackground source={{
-        uri: 'https://lh5.googleusercontent.com/proxy/g87eEEzrDk1VMpfqhRMNmRD5KrLfuLQwEFwOFJp6zmLxBRiy2MuVHGuOl9ZyUuYOPFj09Ik8swH6g7-EXeplGlWnzKQTJzOGWKxXyJ13vCz7N6dxAqc0A0Wcmo2w0munsDGgpl0dfv-RbHnjfY0qMERQ2g'
+        uri: ImageConstant.SIGNIN_IMAGEURI
       }} style={{
         width: '100%',
         height: '100%',
@@ -184,7 +181,7 @@ export default class SignInComponent extends Component {
           <View style={styles.container}>
             <View style={styles.centerContainer}>
               <Image
-                source={{ uri: `https://image.freepik.com/free-vector/cooking-with-love-hand-written-lettering-quote_116399-128.jpg` }}
+                source={{ uri: ImageConstant.APPLOGO_IMAGEURI }}
                 style={styles.imageContainer}
                 resizeMode="cover"
               />
@@ -197,7 +194,7 @@ export default class SignInComponent extends Component {
                 keyboardType='email-address'
                 returnKeyType={"next"}
                 ref={this.fieldRef}
-                tintColor = '#DC7633'
+                tintColor='#DC7633'
                 onSubmitEditing={() => { this.secondTextInput.focus(); }}
                 value={this.state.email}
                 onChangeText={(email) => this.setState({ email })}
@@ -207,7 +204,7 @@ export default class SignInComponent extends Component {
               <OutlinedTextField
                 label='Password'
                 secureTextEntry={true}
-                tintColor = '#DC7633'
+                tintColor='#DC7633'
                 ref={(input) => { this.secondTextInput = input; }}
                 value={this.state.password}
                 onChangeText={(password) => this.setState({ password })}
