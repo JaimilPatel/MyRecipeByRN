@@ -1,13 +1,24 @@
 import React, { Component } from 'react'
 import { View, Image, StyleSheet, Text, FlatList, Dimensions, RefreshControl, ImageBackground } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import { TouchableWithoutFeedback, ScrollView } from 'react-native-gesture-handler'
+import { TouchableWithoutFeedback, ScrollView, TouchableOpacity } from 'react-native-gesture-handler'
 import AsyncStorage from '@react-native-community/async-storage'
 import DataLoadingComponent from './DataLoadingComponent'
 import { connect } from 'react-redux';
 import * as AppConstant from '../constants/AppConstants'
+import ImagePicker from 'react-native-image-picker';
 
 const styles = StyleSheet.create({
+
+  touchableButton: {
+    alignItems: 'center',
+    backgroundColor: '#DC7633',
+    width: 310,
+    justifyContent: "center",
+    borderRadius: 10,
+    height: 45,
+    marginTop: 10,
+  },
 
   rowContainer: {
     flex: 1,
@@ -123,7 +134,15 @@ const styles = StyleSheet.create({
   },
   centerContainer: {
     alignItems: "center"
-  }
+  },
+
+  images: {
+    width: 150,
+    height: 150,
+    marginHorizontal: 3,
+    marginTop: 10,
+    marginStart: 50
+  },
 })
 class ProfileComponent extends Component {
 
@@ -153,6 +172,8 @@ class ProfileComponent extends Component {
       getLastName: '',
       getAuthorizedToken: '',
       isRefreshing: true,
+      uploadImage: undefined,
+      uploadImageUri: '',
     }
   }
 
@@ -167,6 +188,36 @@ class ProfileComponent extends Component {
     }
   };
 
+  //To open ImagePicker
+  showImagePicker = () => {
+    ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
+      if (res.didCancel) {
+      } else if (res.error) {
+      } else {
+        this.setState({
+          uploadImage: { uri: res.uri },
+          uploadImageUri: res.uri
+        });
+
+      }
+    });
+  }
+
+//To render Picked Image
+  renderFileUri() {
+    if (this.state.uploadImageUri) {
+      return <Image
+        source={{ uri: this.state.uploadImage.uri }}
+        style={styles.imageProfileContainer}
+      />
+    } else {
+      return <Image
+        source={require('../images/profile.jpeg')}
+        style={styles.imageProfileContainer}
+      />
+    }
+  }
+
   render() {
     if (this.props.favouriteFeed == null) {
       return (
@@ -180,11 +231,10 @@ class ProfileComponent extends Component {
         <ScrollView>
           <View>
             <View style={styles.centerContainer}>
-              <Image
-                source={require('../images/profile.jpeg')}
-                style={styles.imageProfileContainer}
-                resizeMode="cover"
-              />
+            {this.renderFileUri()}
+            <TouchableOpacity style={[styles.touchableButton, { height: 50, width: 150 }]} onPress={() => this.showImagePicker()}>
+                <Text style={[styles.titleTextColor, { color: 'black', fontSize: 15 }]}>Upload Image</Text>
+              </TouchableOpacity>
             </View>
             <View style={{ height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={[styles.titleTextColor, { marginTop: 5, fontWeight: "bold" }]}>Jay Mehta</Text>
