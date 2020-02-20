@@ -10,6 +10,7 @@ import ProfileComponent from './components/ProfileComponent';
 import { createStackNavigator } from 'react-navigation-stack';
 import { createMaterialBottomTabNavigator } from 'react-navigation-material-bottom-tabs';
 import SplashComponent from './components/SplashComponent';
+import MapComponent from './components/MapComponent';
 
 const internalNavigator = createStackNavigator({
   RecipeDetail: { screen: RecipeDetailsComponent }
@@ -61,10 +62,20 @@ const authNavigator = createSwitchNavigator({
   }
 })
 
+const mapNavigator = createSwitchNavigator({
+  Map : {screen  : MapComponent}
+}, {
+  initialRouteName: 'Map',
+  headerMode: 'none',
+  navigationOptions: {
+    headerVisible: false,
+  }})
+
 const rootNavigator = createStackNavigator({
   auth: authNavigator,
   home: homeNavigator,
-  internal: internalNavigator
+  internal: internalNavigator,
+  map : mapNavigator
 }, {
   initialRouteName: 'auth',
   headerMode: 'none',

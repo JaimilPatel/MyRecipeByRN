@@ -190,32 +190,34 @@ class ProfileComponent extends Component {
 
   //To open ImagePicker
   showImagePicker = () => {
-    ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
-      if (res.didCancel) {
-      } else if (res.error) {
-      } else {
-        this.setState({
-          uploadImage: { uri: res.uri },
-          uploadImageUri: res.uri
-        });
 
-      }
-    });
+    // ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
+    //   if (res.didCancel) {
+    //   } else if (res.error) {
+    //   } else {
+    //     this.setState({
+    //       uploadImage: { uri: res.uri },
+    //       uploadImageUri: res.uri
+    //     });
+
+    //   }
+    // });
+    this.props.navigation.navigate(AppConstant.MAPROUTE);
   }
 
 //To render Picked Image
   renderFileUri() {
-    if (this.state.uploadImageUri) {
-      return <Image
-        source={{ uri: this.state.uploadImage.uri }}
-        style={styles.imageProfileContainer}
-      />
-    } else {
-      return <Image
-        source={require('../images/profile.jpeg')}
-        style={styles.imageProfileContainer}
-      />
-    }
+    // if (this.state.uploadImageUri) {
+    //   return <Image
+    //     source={{ uri: this.state.uploadImage.uri }}
+    //     style={styles.imageProfileContainer}
+    //   />
+    // } else {
+    //   return <Image
+    //     source={require('../images/profile.jpeg')}
+    //     style={styles.imageProfileContainer}
+    //   />
+    // }
   }
 
   render() {
