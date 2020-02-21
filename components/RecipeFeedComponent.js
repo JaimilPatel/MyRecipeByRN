@@ -203,7 +203,7 @@ class RecipeFeedComponent extends Component {
         {
           method: ApiConstant.POST_METHOD,
           headers: {
-            'Authorization': 'Bearer ' + data,
+            'Authorization': 'Bearer ' + this.state.tokenData,
             'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
           },
           body: JSON.stringify({
@@ -232,7 +232,7 @@ class RecipeFeedComponent extends Component {
       {
         method: ApiConstant.POST_METHOD,
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + this.state.tokenData,
           'Content-Type': ApiConstant.CONTENT_TYPE_VALUE
         },
         body: JSON.stringify({
@@ -258,7 +258,7 @@ class RecipeFeedComponent extends Component {
       {
         method: ApiConstant.GET_METHOD,
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + this.state.tokenData,
         },
       }
     ).then((response) => {
@@ -284,7 +284,7 @@ class RecipeFeedComponent extends Component {
       {
         method: ApiConstant.DELETE_METHOD,
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + this.state.tokenData,
         },
       }
     ).then((response) => {
@@ -310,7 +310,7 @@ class RecipeFeedComponent extends Component {
       {
         method: ApiConstant.GET_METHOD,
         headers: {
-          'Authorization': 'Bearer ' + data,
+          'Authorization': 'Bearer ' + this.state.tokenData,
         },
       }
     ).then((response) => {

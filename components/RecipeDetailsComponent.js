@@ -179,6 +179,10 @@ export default class RecipeDetailsComponent extends Component {
             }).then(result => console.log(result)).catch(errorMsg => console.log(errorMsg));
     }
 
+    onLocationData = () =>{
+             this.props.navigation.navigate(AppConstant.MAPROUTE);
+    }
+
     //To Call API for Add Comment
     addComment() {
         this.textComment.clear()
@@ -503,6 +507,11 @@ export default class RecipeDetailsComponent extends Component {
                                     <View style={styles.combineRowContainer}>
                                         <TouchableWithoutFeedback onPress={() => this.onShareData()} >
                                             <Image source={require('../images/share.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
+                                        </TouchableWithoutFeedback>
+                                    </View>
+                                    <View style={styles.combineRowContainer}>
+                                        <TouchableWithoutFeedback onPress={() => this.onLocationData()} >
+                                            <Image source={require('../images/pin.png')} style={{ width: 25, height: 25, tintColor: 'white' }}></Image>
                                         </TouchableWithoutFeedback>
                                     </View>
                                 </View>

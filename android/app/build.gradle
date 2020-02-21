@@ -179,15 +179,18 @@ android {
 }
 
 dependencies {
+    implementation project(':@react-native-community_geolocation')
     implementation(project(':react-native-maps')){
 exclude group: 'com.google.android.gms', module: 'play-services-base'
 exclude group: 'com.google.android.gms', module: 'play-services-maps'
 }
-implementation 'com.google.android.gms:play-services-base:10.0.1'
-implementation 'com.google.android.gms:play-services-maps:10.0.1'
+
+
     implementation project(':react-native-image-picker')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.facebook.react:react-native:+"  // From node_modules
+    provided "com.facebook.react:react-native:+" // From node_modules
+    implementation 'com.google.android.gms:play-services-base:+'
+    implementation 'com.google.android.gms:play-services-maps:+'
     implementation 'com.facebook.fresco:animated-gif:2.0.0'
     implementation 'androidx.appcompat:appcompat:1.1.0-rc01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0-alpha02'

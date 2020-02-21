@@ -7,6 +7,8 @@ import DataLoadingComponent from './DataLoadingComponent'
 import { connect } from 'react-redux';
 import * as AppConstant from '../constants/AppConstants'
 import ImagePicker from 'react-native-image-picker';
+import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps'
+import Geolocation from '@react-native-community/geolocation';
 
 const styles = StyleSheet.create({
 
@@ -190,34 +192,38 @@ class ProfileComponent extends Component {
 
   //To open ImagePicker
   showImagePicker = () => {
+    ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
+      if (res.didCancel) {
+      } else if (res.error) {
+      } else {
+        this.setState({
+          uploadImage: { uri: res.uri },
+          uploadImageUri: res.uri
+        });
 
-    // ImagePicker.showImagePicker({ title: "Pick an Image", maxWidth: 800, maxHeight: 600 }, res => {
-    //   if (res.didCancel) {
-    //   } else if (res.error) {
-    //   } else {
-    //     this.setState({
-    //       uploadImage: { uri: res.uri },
-    //       uploadImageUri: res.uri
-    //     });
+      }
+    });
 
-    //   }
-    // });
-    this.props.navigation.navigate(AppConstant.MAPROUTE);
   }
 
-//To render Picked Image
+  //To render Picked Image
   renderFileUri() {
-    // if (this.state.uploadImageUri) {
-    //   return <Image
-    //     source={{ uri: this.state.uploadImage.uri }}
-    //     style={styles.imageProfileContainer}
-    //   />
-    // } else {
-    //   return <Image
-    //     source={require('../images/profile.jpeg')}
-    //     style={styles.imageProfileContainer}
-    //   />
-    // }
+    if (this.state.uploadImageUri) {
+      return <Image
+        source={{ uri: this.state.uploadImage.uri }}
+        style={styles.imageProfileContainer}
+      />
+    } else {
+      return <Image
+        source={require('../images/profile.jpeg')}
+        style={styles.imageProfileContainer}
+      />
+    }
+  }
+
+  componentDidMount() {
+    Geolocation.getCurrentPosition(info =>
+      console.log(info));
   }
 
   render() {
@@ -233,15 +239,37 @@ class ProfileComponent extends Component {
         <ScrollView>
           <View>
             <View style={styles.centerContainer}>
-            {this.renderFileUri()}
-            <TouchableOpacity style={[styles.touchableButton, { height: 50, width: 150 }]} onPress={() => this.showImagePicker()}>
+              {this.renderFileUri()}
+              <TouchableOpacity style={[styles.touchableButton, { height: 50, width: 150 }]} onPress={() => this.showImagePicker()}>
                 <Text style={[styles.titleTextColor, { color: 'black', fontSize: 15 }]}>Upload Image</Text>
               </TouchableOpacity>
             </View>
-            <View style={{ height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
+            {/* <View style={{ height: 50, width: Dimensions.get('window').width, alignItems: 'center', justifyContent: 'center' }}>
               <Text style={[styles.titleTextColor, { marginTop: 5, fontWeight: "bold" }]}>Jay Mehta</Text>
+            </View> */}
+            <View style = {{justifyContent :'center' , alignItems : 'center'}}>
+            <Text style={[styles.titleTextColor, { marginTop: 10, fontWeight : 'bold' }]}>You are here</Text>
             </View>
-            <View style={{ flexDirection: 'row', marginStart: 10 }}>
+            <MapView
+            style={{ flex: 1 , height: 200 , margin : 20}}
+            provider={PROVIDER_GOOGLE}
+            initialRegion={{
+                latitude: 23.0259,
+                longitude: 72.5034,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421
+            }}
+            loadingEnabled={true}
+            loadingIndicatorColor="#666666"
+            loadingBackgroundColor="#eeeeee"
+            moveOnMarkerPress={false}
+            showsUserLocation={true}
+            showsCompass={true}
+            showsPointsOfInterest={false}
+            showsUserLocation={true}
+        >
+        </MapView>
+        <View style={{ flexDirection: 'row', marginStart: 10 }}>
               <Image
                 style={{ width: 30, height: 30, marginStart: 10 }}
                 source={require('../images/cooking.png')}
